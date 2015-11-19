@@ -131,12 +131,12 @@ configure_file(AmbientConfig.cmake.in ${PROJECT_BINARY_DIR}/AmbientConfig.cmake)
 install(DIRECTORY src/ambient src/utils
         DESTINATION include
         COMPONENT headers
-        PATTERN .svn EXCLUDE
+        PATTERN .git EXCLUDE
         PATTERN CMakeLists.txt EXCLUDE)
 
 install(DIRECTORY examples
         DESTINATION share
-        PATTERN .svn EXCLUDE
+        PATTERN .git EXCLUDE
         PATTERN CMakeLists.txt EXCLUDE)
 
 install(FILES ${PROJECT_BINARY_DIR}/AmbientConfig.cmake

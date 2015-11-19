@@ -28,6 +28,7 @@
 #ifndef AMBIENT_INTERFACE_KERNEL
 #define AMBIENT_INTERFACE_KERNEL
 
+#include "utils/index_tuple.h"
 #include "ambient/interface/kernel_inliner.hpp"
 
 namespace ambient {
@@ -49,13 +50,13 @@ namespace ambient {
             inliner::invoke(this);
             inliner::cleanup(this);
         }
-        template<size_t...I, typename... Args>
-        static void expand_spawn(std::index_sequence<I...>, Args&... args){
+        template<unsigned...I, typename... Args>
+        static void expand_spawn(redi::index_tuple<I...>, Args&... args){
             inliner::latch(new kernel(), info<Args>::template unfold<typename inliner::template get_type<I> >(args)...);
         }
         template<typename... Args>
         static inline void spawn(Args&... args){
-            expand_spawn(std::make_index_sequence<sizeof...(Args)>(), args...);
+            expand_spawn(redi::to_index_tuple<Args...>(), args...);
         }
         #undef inliner
     };

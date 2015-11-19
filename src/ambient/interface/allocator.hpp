@@ -30,11 +30,10 @@
 
 namespace ambient {
     using model::history;
-    using model::revision;
 
     struct stateful {
-        revision* before;
-        revision* after;
+        ambient::revision* before;
+        ambient::revision* after;
     };
 
     struct default_allocator : public stateful {
