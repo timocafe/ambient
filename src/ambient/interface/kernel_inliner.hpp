@@ -53,7 +53,8 @@ namespace ambient {
     template<int N> void expand_modify_local(functor* o){}
     template<int N> void expand_modify(functor* o){}
     template<int N> bool expand_pin(functor* o){ return false; }
-    template<int N> void expand_deallocate(functor* o){ }
+    template<int N> void expand_load(functor* o){}
+    template<int N> void expand_deallocate(functor* o){}
     template<int N> bool expand_ready(functor* o){ return true; }
 
     template<int N, typename T, typename... TF>
@@ -80,6 +81,11 @@ namespace ambient {
     bool expand_pin(functor* o){
         return info<remove_reference<T> >::typed::template pin<N>(o) ||
                expand_pin<N+1,TF...>(o);
+    }
+    template<int N, typename T, typename... TF>
+    void expand_load(functor* o){
+        info<remove_reference<T> >::typed::template load<N>(o);
+        expand_load<N+1, TF...>(o);
     }
     template<int N, typename T, typename... TF>
     void expand_deallocate(functor* o){
@@ -118,9 +124,10 @@ namespace ambient {
         }
         template<unsigned...I>
         static void expand_invoke(redi::index_tuple<I...>, functor* o){
-            (*fp)(info<remove_reference<TF> >::typed::template revised<I>(o)...);
+            (*fp)(info<remove_reference<TF> >::typed::template forward<I>(o)...);
         }
         static inline void invoke(functor* o){
+            expand_load<0, TF...>(o);
             expand_invoke(redi::to_index_tuple<TF...>(), o);
         }
     };

@@ -41,7 +41,8 @@ namespace ambient {
         template<size_t arg> static bool pin            (functor* m){ return false;          }
         template<size_t arg> static void score          (T& obj)    {                        }
         template<size_t arg> static bool ready          (functor* m){ return true;           }
-        template<size_t arg> static T&   revised        (functor* m){ EXTRACT(o); return *o; }
+        template<size_t arg> static void load           (functor* m){ }
+        template<size_t arg> static T&   forward        (functor* m){ EXTRACT(o); return *o; }
         template<size_t arg> static void modify (T& obj, functor* m){
             m->arguments[arg] = (void*)new(ambient::memory::malloc<memory::cpu::instr_bulk,T>()) T(obj); 
         }
@@ -52,7 +53,7 @@ namespace ambient {
         static constexpr bool ReferenceOnly = false;
     };
     template <typename T> struct singular_inplace_info : public singular_info<T> {
-        template<size_t arg> static T& revised(functor* m){ return *(T*)&m->arguments[arg]; }
+        template<size_t arg> static T&   forward(functor* m){ return *(T*)&m->arguments[arg]; }
         template<size_t arg> static void modify_remote(T& obj){ }
         template<size_t arg> static void modify_local(T& obj, functor* m){ *(T*)&m->arguments[arg] = obj; }
         template<size_t arg> static void modify(T& obj, functor* m){ *(T*)&m->arguments[arg] = obj; }
@@ -137,9 +138,8 @@ namespace ambient {
             var->ambient_allocator.after = o->current;
         }
         template<size_t arg>
-        static T& revised(functor* m){ 
+        static void load(functor* m){ 
             EXTRACT(o); revise(*o);
-            return *o;
         }
         template<size_t arg> 
         static bool pin(functor* m){ 

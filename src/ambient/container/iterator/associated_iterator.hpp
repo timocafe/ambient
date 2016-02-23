@@ -34,25 +34,37 @@ namespace ambient {
     class associated_iterator {
     public:
         typedef Container container_type;
-        typedef typename Container::value_type value_type;
+        typedef typename std::iterator_traits<ambient::associated_iterator<Container> >::value_type value_type;
 
         associated_iterator() : container(NULL), position(0) {}
         associated_iterator(container_type& owner, size_t p) : container(&owner), position(p) {}
-        void operator++ (){
-            position++;
-        }
         associated_iterator& operator += (size_t offset){
             position += offset;
             return *this;
+        }
+        associated_iterator& operator++ (){
+            position++;
+            return *this;
+        }
+        associated_iterator operator++ (int){
+            associated_iterator tmp(*this);
+            operator++();
+            return tmp;
         }
         associated_iterator& operator -= (size_t offset){
             position -= offset;
             return *this;
         }
-        value_type& operator* (){
-            return (*container)[position];
+        associated_iterator& operator-- (){
+            position--;
+            return *this;
         }
-        const value_type& operator* () const {
+        associated_iterator operator-- (int){
+            associated_iterator tmp(*this);
+            operator--();
+            return tmp;
+        }
+        value_type& operator* () const {
             return (*container)[position];
         }
         container_type& get_container(){
@@ -62,15 +74,22 @@ namespace ambient {
             return *container;
         }
         size_t position;
-    private:
+    public:
         template<typename T>
         friend bool operator == (const associated_iterator<T>& lhs, const associated_iterator<T>& rhs);
+        template<typename T>
+        friend bool operator != (const associated_iterator<T>& lhs, const associated_iterator<T>& rhs);
         container_type* container;
     };
 
     template <class Container> 
     bool operator == (const associated_iterator<Container>& lhs, const associated_iterator<Container>& rhs){
         return (lhs.position == rhs.position && lhs.container == rhs.container);
+    }
+
+    template <class Container> 
+    bool operator != (const associated_iterator<Container>& lhs, const associated_iterator<Container>& rhs){
+        return (lhs.position != rhs.position || lhs.container != rhs.container);
     }
 
     template <class Container, class OtherContainer> 
@@ -105,9 +124,18 @@ namespace std {
     template<class Container>
     class iterator_traits<ambient::associated_iterator<Container> > {
     public:
+        typedef std::random_access_iterator_tag iterator_category;
         typedef typename Container::value_type value_type;
+        typedef size_t difference_type;
     };
 
+    template<class Container>
+    class iterator_traits<ambient::associated_iterator<const Container> > {
+    public:
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef const typename Container::value_type value_type;
+        typedef size_t difference_type;
+    };
 }
 
 #endif

@@ -57,7 +57,7 @@ namespace ambient { namespace controllers {
         else ambient::select().get_controller().queue(this);
     }
     inline void set<revision>::operator += (rank_t rank){
-        *handle += rank;
+        handle->append(rank);
     }
     inline bool set<revision>::ready(){
         return (t.generator != NULL ? false : handle->test());

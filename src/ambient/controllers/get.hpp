@@ -55,7 +55,7 @@ namespace ambient { namespace controllers {
         t.invalidate();
     }
     inline void get<revision>::operator += (rank_t rank){
-        *handle += rank;
+        handle->append(rank);
         if(handle->involved() && !t.valid()){
             t.use();
             t.generator = this;

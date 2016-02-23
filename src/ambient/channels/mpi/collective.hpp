@@ -48,7 +48,7 @@ namespace ambient { namespace channels { namespace mpi {
         this->tags.push_back(-1);
     }
 
-    inline void collective<typename channel::block_type>::operator += (rank_t rank){
+    inline void collective<typename channel::block_type>::append(rank_t rank){
         if(!states[rank]){
             states[rank] = true;
             if(states.back()){

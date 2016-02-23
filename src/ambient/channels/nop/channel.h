@@ -34,7 +34,7 @@ namespace ambient { namespace channels { namespace nop {
 
     template<class T> struct collective {
         bool test(){ return true; }
-        void operator += (rank_t rank){}
+        void append(rank_t rank){}
         bool involved(){ return true; }
     };
 

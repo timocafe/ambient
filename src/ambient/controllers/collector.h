@@ -57,4 +57,3 @@ namespace ambient{ namespace memory {
 } }
 
 #endif
-

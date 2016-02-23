@@ -44,11 +44,11 @@ namespace ambient {
     struct function_traits<ReturnType(ClassType::*)(Args...) const> {
         typedef ReturnType (*pointer)(Args...);
         typedef const std::function<ReturnType(Args...)> function;
-        typedef lambda_kernel<const std::function<ReturnType(Args...)>, Args... > kernel_type;
+        using kernel_type = lambda_kernel<const std::function<ReturnType(Args...)>, Args... >;
     };
 
     template <typename Function>
-    typename function_traits<Function>::function to_function (Function& lambda) {
+    typename function_traits<Function>::function to_function(Function& lambda){
         return static_cast<typename function_traits<Function>::function>(lambda);
     }
 
