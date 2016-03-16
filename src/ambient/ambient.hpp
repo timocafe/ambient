@@ -29,7 +29,7 @@
 #define AMBIENT
 
 #ifndef AMBIENT_DEFAULT_IB
-#define AMBIENT_DEFAULT_IB           2048
+#define AMBIENT_DEFAULT_IB           512
 #endif
 #ifndef AMBIENT_INSTR_BULK_CHUNK
 #define AMBIENT_INSTR_BULK_CHUNK     16777216 // 16 MB
