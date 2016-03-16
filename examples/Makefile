@@ -6,7 +6,7 @@ CXXFLAGS?= -std=c++11 -O3 -DNDEBUG -I../../include -DAMBIENT_MPI=MPI_DISABLE -mk
 .DEFAULT: all
 .PHONY: all clean
 
-EXAMPLES = diffusion partitioned_vector vector atomic matrix mp_gemm_simple mp_gemm_log groups future
+EXAMPLES = diffusion partitioned_vector vector atomic matrix mp_gemm mp_gemm_simple mp_gemm_log groups future
 all: $(EXAMPLES)
 
 %: %.cpp
