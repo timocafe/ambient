@@ -877,7 +877,7 @@ namespace ambient { inline namespace numeric {
     std::ostream& operator << (std::ostream& o, const tiles<Matrix, IB>& a){
         int size = a.num_tiles();
         for(int i = 0; i < size; i++)
-            o << a[i];
+            o << ambient::load(a[i]);
         return o;
     }
 
