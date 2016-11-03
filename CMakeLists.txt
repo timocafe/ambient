@@ -136,7 +136,7 @@ if(AMBIENT_REGRESSION_TESTS)
   enable_testing()
   add_subdirectory(tests/functional)
   add_subdirectory(tests/performance)
-else(AMBIENT_REGRESSION_TESTS)
+elseif(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   message("\n\n Ambient is a header-only library (so go ahead and 'make install') \n\n")
 endif(AMBIENT_REGRESSION_TESTS)
 
