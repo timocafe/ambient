@@ -38,7 +38,7 @@ namespace ambient {
     template<class K>
     class kernel : public functor {
     public:
-        #define inliner kernel_inliner<typename K::ftype,K::c>
+        #define inliner kernel_inliner<typename K::ftype, K::c>
         inline void operator delete (void* ptr){ }
         inline void* operator new (size_t size){
             return memory::cpu::instr_bulk::malloc<sizeof(K)+sizeof(void*)*inliner::arity>();
