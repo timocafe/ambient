@@ -1,4 +1,3 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${AMBIENT_CXX_FLAGS} ${AMBIENT_THREADING_FLAGS} ${AMBIENT_MPI_FLAGS}")
 
 add_executable( transpose   transpose.cpp )
 add_executable( resize      resize.cpp    )
@@ -37,6 +36,6 @@ foreach( functional_test
          adjoint
          hermitian
        )
-    target_link_libraries (${functional_test} ${AMBIENT_LIBRARIES})
+    target_link_libraries (${functional_test} ambient)
     add_test(${functional_test} ${functional_test})
 endforeach(functional_test)
