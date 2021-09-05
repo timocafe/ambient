@@ -8,6 +8,9 @@ cmake_minimum_required (VERSION 3.0)
 
 project (ambient)
 
+
+SET(CMAKE_CXX_STANDARD 20)
+
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "/opt/ambient" CACHE PATH "Ambient install prefix" FORCE)
 endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -31,7 +34,6 @@ set(MKL_LIB_DIR "" CACHE PATH "Location of BLAS/LAPACK libraries.")
 set(MKL_LIBRARIES "" CACHE STRINGS "BLAS/LAPACK libraries")
 set(PLASMA_LIB_DIR "" CACHE PATH "Location of PLASMA libraries.")
 set(PLASMA_LIBRARIES "" CACHE STRINGS "PLASMA libraries")
-set(AMBIENT_CXX_FLAGS "-std=c++14" CACHE STRINGS "C++14 support is required, e.g. -std=c++14 and -gcc-name=XX")
 option(AMBIENT_REGRESSION_TESTS "Build regression tests" OFF)
 
 ########################################################################
@@ -88,11 +90,13 @@ elseif(NOT ${AMBIENT_MPI} MATCHES "auto")
 endif()
 message(STATUS "Ambient MPI: ${AMBIENT_MPI}")
 
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+
 message(STATUS "Math lib dirs: ${MKL_LIB_DIR} ${PLASMA_LIB_DIR}")
 message(STATUS "Math libs: ${MKL_LIBRARIES} ${PLASMA_LIBRARIES}")
 list(APPEND AMBIENT_LIBRARY_DIRS ${MKL_LIB_DIR} ${PLASMA_LIB_DIR})
 list(APPEND AMBIENT_LIBRARIES ${MKL_LIBRARIES} ${PLASMA_LIBRARIES})
-list(APPEND AMBIENT_COMPILER_FLAGS ${AMBIENT_CXX_FLAGS})
 foreach(LIB_DIR ${AMBIENT_LIBRARY_DIRS})
   list(INSERT AMBIENT_LIBRARIES 0 "-L${LIB_DIR}")
 endforeach(LIB_DIR)

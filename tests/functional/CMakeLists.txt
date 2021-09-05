@@ -36,6 +36,6 @@ foreach( functional_test
          adjoint
          hermitian
        )
-    target_link_libraries (${functional_test} ambient)
+    target_link_libraries (${functional_test} PUBLIC OpenMP::OpenMP_CXX ambient)
     add_test(${functional_test} ${functional_test})
 endforeach(functional_test)
