@@ -74,6 +74,7 @@
 #include <utility>
 #include <atomic>
 #include <tuple>
+#include <numeric>
 // }}}
 
 #include "ambient/utils/dim2.hpp"

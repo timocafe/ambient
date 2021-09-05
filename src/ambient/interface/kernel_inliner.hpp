@@ -42,91 +42,91 @@ namespace ambient {
         template<typename F> struct fail_if_true<true, F> { };
         typedef typename fail_if_true<info<T>::typed::ReferenceOnly, T>::type type; // T can be passed only by reference
     };
- 
+
     template<typename T>
     struct check_if_not_reference<T&> {
         typedef T type;
     };
 
-    template<int N> void expand_score(){}
-    template<int N> void expand_modify_remote(){}
-    template<int N> void expand_modify_local(functor* o){}
-    template<int N> void expand_modify(functor* o){}
-    template<int N> bool expand_pin(functor* o){ return false; }
-    template<int N> void expand_load(functor* o){}
-    template<int N> void expand_deallocate(functor* o){}
-    template<int N> bool expand_ready(functor* o){ return true; }
+    template<int N> void expand_score() {}
+    template<int N> void expand_modify_remote() {}
+    template<int N> void expand_modify_local(functor* o) {}
+    template<int N> void expand_modify(functor* o) {}
+    template<int N> bool expand_pin(functor* o) { return false; }
+    template<int N> void expand_load(functor* o) {}
+    template<int N> void expand_deallocate(functor* o) {}
+    template<int N> bool expand_ready(functor* o) { return true; }
 
     template<int N, typename T, typename... TF>
-    void expand_score(T& arg, TF&... other){
+    void expand_score(T& arg, TF&... other) {
         info<T>::typed::template score<N>(arg);
-        expand_score<N+1>(other...);
+        expand_score<N + 1>(other...);
     }
     template<int N, typename T, typename... TF>
-    void expand_modify_remote(T& arg, TF&... other){
+    void expand_modify_remote(T& arg, TF&... other) {
         info<T>::typed::template modify_remote<N>(arg);
-        expand_modify_remote<N+1>(other...);
+        expand_modify_remote<N + 1>(other...);
     }
     template<int N, typename T, typename... TF>
-    void expand_modify_local(functor* o, T& arg, TF&... other){
+    void expand_modify_local(functor* o, T& arg, TF&... other) {
         info<T>::typed::template modify_local<N>(arg, o);
-        expand_modify_local<N+1>(o, other...);
+        expand_modify_local<N + 1>(o, other...);
     }
     template<int N, typename T, typename... TF>
-    void expand_modify(functor* o, T& arg, TF&... other){
+    void expand_modify(functor* o, T& arg, TF&... other) {
         info<T>::typed::template modify<N>(arg, o);
-        expand_modify<N+1>(o, other...);
+        expand_modify<N + 1>(o, other...);
     }
     template<int N, typename T, typename... TF>
-    bool expand_pin(functor* o){
+    bool expand_pin(functor* o) {
         return info<remove_reference<T> >::typed::template pin<N>(o) ||
-               expand_pin<N+1,TF...>(o);
+            expand_pin<N + 1, TF...>(o);
     }
     template<int N, typename T, typename... TF>
-    void expand_load(functor* o){
+    void expand_load(functor* o) {
         info<remove_reference<T> >::typed::template load<N>(o);
-        expand_load<N+1, TF...>(o);
+        expand_load<N + 1, TF...>(o);
     }
     template<int N, typename T, typename... TF>
-    void expand_deallocate(functor* o){
+    void expand_deallocate(functor* o) {
         info<remove_reference<T> >::typed::template deallocate<N>(o);
-        expand_deallocate<N+1,TF...>(o);
+        expand_deallocate<N + 1, TF...>(o);
     }
     template<int N, typename T, typename... TF>
-    bool expand_ready(functor* o){
+    bool expand_ready(functor* o) {
         return info<remove_reference<T> >::typed::template ready<N>(o) &&
-               expand_ready<N+1,TF...>(o);
+            expand_ready<N + 1, TF...>(o);
     }
 
     template<typename FP, FP fp>
     struct kernel_inliner {};
 
-    template< typename... TF , void(*fp)( TF... )>
-    struct kernel_inliner<void(*)( TF... ), fp> {
+    template< typename... TF, void(*fp)(TF...)>
+    struct kernel_inliner<void(*)(TF...), fp> {
         template <int N>
-        using get_type = remove_reference< typename check_if_not_reference< 
-                             typename std::tuple_element<N, std::tuple<TF...> >::type 
-                         >::type >;
+        using get_type = remove_reference< typename check_if_not_reference<
+            typename std::tuple_element<N, std::tuple<TF...> >::type
+        >::type >;
         static const int arity = sizeof...(TF);
 
-        static inline void latch(functor* o, TF&... args){
-            if(ambient::select().tunable())              { expand_score<0>(args...); ambient::select().schedule(); }
-            if(ambient::select().get_actor().remote())   { expand_modify_remote<0>(args...); return; }
-            else if(ambient::select().get_actor().local()) expand_modify_local<0>(o, args...);
+        static inline void latch(functor* o, TF&... args) {
+            if (ambient::select().tunable()) { expand_score<0>(args...); ambient::select().schedule(); }
+            if (ambient::select().get_actor().remote()) { expand_modify_remote<0>(args...); return; }
+            else if (ambient::select().get_actor().local()) expand_modify_local<0>(o, args...);
             else                                           expand_modify<0>(o, args...);
-            expand_pin<0,TF...>(o) || ambient::select().get_controller().queue(o);
+            expand_pin<0, TF...>(o) || ambient::select().get_controller().queue(o);
         }
-        static inline void cleanup(functor* o){
-            expand_deallocate<0,TF...>(o);
+        static inline void cleanup(functor* o) {
+            expand_deallocate<0, TF...>(o);
         }
-        static inline bool ready(functor* o){
-            return expand_ready<0,TF...>(o);
+        static inline bool ready(functor* o) {
+            return expand_ready<0, TF...>(o);
         }
         template<unsigned...I>
-        static void expand_invoke(redi::index_tuple<I...>, functor* o){
+        static void expand_invoke(redi::index_tuple<I...>, functor* o) {
             (*fp)(info<remove_reference<TF> >::typed::template forward<I>(o)...);
         }
-        static inline void invoke(functor* o){
+        static inline void invoke(functor* o) {
             expand_load<0, TF...>(o);
             expand_invoke(redi::to_index_tuple<TF...>(), o);
         }

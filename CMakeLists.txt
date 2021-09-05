@@ -129,6 +129,8 @@ target_link_libraries(ambient
   INTERFACE ${AMBIENT_LIBRARIES}
 )
 
+add_subdirectory(examples)
+
 ########################################################################
 #
 # Tests

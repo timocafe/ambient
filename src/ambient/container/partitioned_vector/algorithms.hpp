@@ -140,6 +140,18 @@ namespace ambient {
         }
     }
 
+
+    template <typename T>
+    inline T sec_reduce_add(const T* data, size_t first, size_t second)
+    {
+        T total = T();
+#pragma omp simd reduction(+ \
+                           : total)
+        for (int i = first; i < second; ++i)
+            total += data[i];
+        return total;
+    }
+
     template <class InputIterator, class T>
     ambient::atomic<T> reduce(InputIterator begin, InputIterator end, T init){
         typedef block_iterator<typename InputIterator::container_type> iterator;
@@ -151,7 +163,7 @@ namespace ambient {
         for(size_t b = 0; bit != end; ++bit){
             ambient::async([](const block_type& block, size_t first, size_t second, const block_type& res, size_t idx){
                                   const typename block_type::value_type* array = block.cbegin();
-                                  const_cast<block_type&>(res)[idx] = __sec_reduce_add(array[first:second]);
+                                  const_cast<block_type&>(res)[idx] = sec_reduce_add(array,first,second);
                               }, *bit, bit.first, bit.second, reduced, b);
             b++;
         }
@@ -160,7 +172,7 @@ namespace ambient {
         ambient::async([](const block_type& block, ambient::atomic<T>& value){
                               const typename block_type::value_type* array = block.cbegin();
                               while(!ambient::locked_once(block)) continue;
-                              value.set(value.get()+__sec_reduce_add(array[0:block.size()]));
+                              value.set(value.get()+sec_reduce_add(array,0,block.size()));
                           }, reduced, res);
         return res; 
     }

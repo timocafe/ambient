@@ -30,46 +30,59 @@
 
 #include <cstring>
 
-namespace ambient {
+namespace ambient
+{
 
     template <typename T>
-    inline void memcpy(T* dd, const T* sd, size_t w, T alfa){
+    inline void memcpy(T* dd, const T* sd, size_t w, T alfa)
+    {
         std::memcpy(dd, sd, w);
     }
 
     template <typename T>
-    inline void memscal(T* dd, const T* sd, size_t w, T alfa){
-        int z = w/sizeof(T);
-        do{ *dd++ = alfa*(*sd++); }while(--z > 0); // note: dd != sd
+    inline void memscal(T* dd, const T* sd, size_t w, T alfa)
+    {
+        int z = w / sizeof(T);
+        do
+        {
+            *dd++ = alfa * (*sd++);
+        } while (--z > 0); // note: dd != sd
     }
 
     template <typename T>
-    inline void memscala(T* dd, const T* sd, size_t w, T alfa){
-        int z = w/sizeof(T);
-        do{ *dd++ += alfa*(*sd++); }while(--z > 0); // note: dd != sd
+    inline void memscala(T* dd, const T* sd, size_t w, T alfa)
+    {
+        int z = w / sizeof(T);
+        do
+        {
+            *dd++ += alfa * (*sd++);
+        } while (--z > 0); // note: dd != sd
     }
 
     template <typename T>
-    inline typename std::complex<T>::value_type dot(const std::complex<T>* a, const std::complex<T>* b, int size){
+    inline typename std::complex<T>::value_type dot(const std::complex<T>* a, const std::complex<T>* b, int size)
+    {
         typename std::complex<T>::value_type summ(0);
-        for(size_t k=0; k < size; k++)
-           summ += std::real(a[k]*std::conj(b[k]));
+        for (size_t k = 0; k < size; k++)
+            summ += std::real(a[k] * std::conj(b[k]));
         return summ;
     }
 
-    inline double dot(const double* a, const double* b, int size){
+    inline double dot(const double* a, const double* b, int size)
+    {
         static const int ONE = 1;
         return ddot_(&size, a, &ONE, b, &ONE);
     }
 
-    template<typename T, void(*PTF)(T* dd, const T* sd, size_t w, T alfa)>
-    inline void memptf(T* dst, int ldb, dim2 dst_p, 
-                       const T* src, int lda, dim2 src_p, 
-                       dim2 size, T alfa = 0.0)
+    template <typename T, void (*PTF)(T* dd, const T* sd, size_t w, T alfa)>
+    inline void memptf(T* dst, int ldb, dim2 dst_p,
+        const T* src, int lda, dim2 src_p,
+        dim2 size, T alfa = 0.0)
     {
-        #ifdef AMBIENT_CHECK_BOUNDARIES
-        if(ambient::dim(dst).x - dst_p.x < size.x || ambient::dim(dst).y - dst_p.y < size.y ||
-           ambient::dim(src).x - src_p.x < size.x || ambient::dim(src).y - src_p.y < size.y){
+#ifdef AMBIENT_CHECK_BOUNDARIES
+        if (ambient::dim(dst).x - dst_p.x < size.x || ambient::dim(dst).y - dst_p.y < size.y ||
+            ambient::dim(src).x - src_p.x < size.x || ambient::dim(src).y - src_p.y < size.y)
+        {
             std::cout << "Error: invalid memory movement: \n";
             std::cout << "Matrix dst " << ambient::dim(dst).x << "x" << ambient::dim(dst).y << "\n";
             std::cout << "Dest p " << dst_p.x << "x" << dst_p.y << "\n";
@@ -78,12 +91,17 @@ namespace ambient {
             std::cout << "Block size " << size.x << "x" << size.y << "\n";
             ambient::trace();
         }
-        #endif
+#endif
         int n = size.x;
-        int m = size.y*sizeof(T);
-        const T* sd = src + src_p.y + src_p.x*lda;
-        T* dd = dst + dst_p.y + dst_p.x*ldb;
-        do{ PTF(dd, sd, m, alfa); sd += lda; dd += ldb; }while(--n > 0);
+        int m = size.y * sizeof(T);
+        const T* sd = src + src_p.y + src_p.x * lda;
+        T* dd = dst + dst_p.y + dst_p.x * ldb;
+        do
+        {
+            PTF(dd, sd, m, alfa);
+            sd += lda;
+            dd += ldb;
+        } while (--n > 0);
     }
 }
 

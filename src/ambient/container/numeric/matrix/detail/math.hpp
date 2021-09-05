@@ -28,24 +28,24 @@
 #ifndef AMBIENT_CONTAINER_NUMERIC_MATRIX_DETAIL_MATH
 #define AMBIENT_CONTAINER_NUMERIC_MATRIX_DETAIL_MATH
 
-
 template <int I>
-struct int_type {
+struct int_type
+{
     const static int value = I;
 };
 
-extern "C" {
+extern "C"
+{
 
-    int LAPACKE_dbdsdc(int matrix_order, char uplo, char compq, 
-                       int n, double* d, double* e, double* u, 
-                       int ldu, double* vt, int ldvt, double* q, 
-                       int* iq);
-    double       ddot_(const int*, const double*, const int*, 
-                       const double*, const int*);
-    void       dgebd2_(int*, int*, double*, 
-                       int*, double*, double*, 
-                       double*, double*, double*, int*);
-
+    int LAPACKE_dbdsdc(int matrix_order, char uplo, char compq,
+                       int n, double *d, double *e, double *u,
+                       int ldu, double *vt, int ldvt, double *q,
+                       int *iq);
+    double ddot_(const int *, const double *, const int *,
+                 const double *, const int *);
+    void dgebd2_(int *, int *, double *,
+                 int *, double *, double *,
+                 double *, double *, double *, int *);
 }
 
 #endif

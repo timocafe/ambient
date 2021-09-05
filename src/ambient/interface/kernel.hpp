@@ -38,12 +38,12 @@ namespace ambient {
     template<class K>
     class kernel : public functor {
     public:
-        #define inliner kernel_inliner<typename K::ftype, K::c>
-        inline void operator delete (void* ptr){ }
-        inline void* operator new (size_t size){
-            return memory::cpu::instr_bulk::malloc<sizeof(K)+sizeof(void*)*inliner::arity>();
+#define inliner kernel_inliner<typename K::ftype, K::c>
+        inline void operator delete (void* ptr) { }
+        inline void* operator new (size_t size) {
+            return memory::cpu::instr_bulk::malloc<sizeof(K) + sizeof(void*) * inliner::arity>();
         }
-        virtual bool ready() override { 
+        virtual bool ready() override {
             return inliner::ready(this);
         }
         virtual void invoke() override {
@@ -51,14 +51,14 @@ namespace ambient {
             inliner::cleanup(this);
         }
         template<unsigned...I, typename... Args>
-        static void expand_spawn(redi::index_tuple<I...>, Args&... args){
+        static void expand_spawn(redi::index_tuple<I...>, Args&... args) {
             inliner::latch(new kernel(), info<Args>::template unfold<typename inliner::template get_type<I> >(args)...);
         }
         template<typename... Args>
-        static inline void spawn(Args&... args){
+        static inline void spawn(Args&... args) {
             expand_spawn(redi::to_index_tuple<Args...>(), args...);
         }
-        #undef inliner
+#undef inliner
     };
 }
 
