@@ -28,67 +28,70 @@
 #ifndef AMBIENT_MODEL_TRANSFORMABLE
 #define AMBIENT_MODEL_TRANSFORMABLE
 
-namespace ambient { namespace model {
+namespace ambient {
+    namespace model {
 
-    template<typename T> constexpr T op_single (T a){ return T(); }
-    template<typename T> constexpr T op_double (T a, T b){ return T(); }
+        template<typename T> constexpr T op_single(T a) { return T(); }
+        template<typename T> constexpr T op_double(T a, T b) { return T(); }
 
-    class transformable {
-    public:
-        union numeric_union {
-            typedef std::complex<double> limit; 
-            bool b; 
-            double d; 
-            std::complex<double> c; 
-            size_t s; 
-            operator bool& ();
-            operator double& ();
-            operator std::complex<double>& ();
-            operator size_t& ();
-            void operator = (bool value);
-            void operator = (double value);
-            void operator = (std::complex<double> value);
-            void operator = (size_t value);
-            numeric_union(){ }
+        class transformable {
+        public:
+            union numeric_union {
+                typedef std::complex<double> limit;
+                bool b;
+                double d;
+                std::complex<double> c;
+                size_t s;
+                operator bool& ();
+                operator double& ();
+                operator std::complex<double>& ();
+                operator size_t& ();
+                void operator = (bool value);
+                void operator = (double value);
+                void operator = (std::complex<double> value);
+                void operator = (size_t value);
+                numeric_union() { }
+            };
+            void* operator new  (size_t, void*);
+            void operator delete (void*, void*);
+            virtual numeric_union eval() const = 0;
+            virtual transformable& operator += (transformable& r) = 0;
+
+            const transformable* l;
+            const transformable* r;
+            mutable numeric_union v;
+            functor* generator;
         };
-        void* operator new  (size_t, void*);
-        void operator delete (void*, void*);
-        virtual numeric_union eval() const = 0;
-        virtual transformable& operator += (transformable& r) = 0;
 
-        const transformable* l;
-        const transformable* r;
-        mutable numeric_union v;
-        functor* generator;
-    };
+        template <typename T>
+        class transformable_value : public transformable {
+        public:
+            transformable_value(T value);
+            virtual transformable::numeric_union eval() const;
+            virtual transformable& operator += (transformable& r);
+        };
 
-    template <typename T>
-    class transformable_value : public transformable {
-    public:
-        transformable_value(T value);
-        virtual transformable::numeric_union eval() const;
-        virtual transformable& operator += (transformable& r);
-    };
+        template <typename T, typename FP, FP OP>
+        class transformable_expr : public transformable {
+        public:
+            transformable_expr(const transformable* l);
+            transformable_expr(const transformable* l, const transformable* r);
+            virtual transformable::numeric_union eval() const;
+            virtual transformable& operator += (transformable& r);
+        };
 
-    template <typename T, typename FP, FP OP>
-    class transformable_expr : public transformable {
-    public:
-        transformable_expr(const transformable* l);
-        transformable_expr(const transformable* l, const transformable* r);
-        virtual transformable::numeric_union eval() const;
-        virtual transformable& operator += (transformable& r); 
-    };
-
-    constexpr int max(int a, int b){ return a > b ? a : b; }
-    // injecting templated T is also possible (except in collector) //
-    constexpr size_t sizeof_transformable(){ return ambient::memory::aligned_64
-                                                    < max( sizeof(transformable_value<typename transformable::numeric_union::limit>), 
-                                                           sizeof(transformable_expr <typename transformable::numeric_union::limit,
-                                                                                      decltype(&op_double<typename transformable::numeric_union::limit>),
-                                                                                      op_double>)
-                                                         )
-                                                    >();
-                                           }
-} }
+        constexpr int max(int a, int b) { return a > b ? a : b; }
+        // injecting templated T is also possible (except in collector) //
+        constexpr size_t sizeof_transformable() {
+            return ambient::memory::aligned_64
+                < max(sizeof(transformable_value<typename transformable::numeric_union::limit>),
+                    sizeof(transformable_expr <typename transformable::numeric_union::limit,
+                        decltype(&op_double<typename transformable::numeric_union::limit>),
+                        op_double>)
+                )
+                >();
+        }
+    }
+}
 
 #endif

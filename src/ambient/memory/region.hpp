@@ -28,72 +28,74 @@
 #ifndef AMBIENT_MEMORY_REGION
 #define AMBIENT_MEMORY_REGION
 
-namespace ambient { namespace memory {
+namespace ambient {
+    namespace memory {
 
-    constexpr size_t aligned_64(size_t size){ return 64 * (size_t)((size+63)/64); }
-    template<size_t S> constexpr size_t aligned_64(){ return 64 * (size_t)((S+63)/64); }
+        constexpr size_t aligned_64(size_t size) { return 64 * (size_t)((size + 63) / 64); }
+        template<size_t S> constexpr size_t aligned_64() { return 64 * (size_t)((S + 63) / 64); }
 
-    template<size_t S, class Factory>
-    class serial_region {
-    public:
-        serial_region(){
-            this->buffer = NULL;
-            this->iterator = (char*)this->buffer+S;
-        }
-        void realloc(){
-            this->buffer = Factory::provide();
-            this->iterator = (char*)this->buffer;
-        }
-        void* malloc(size_t sz){
-            if(((size_t)iterator + sz - (size_t)this->buffer) >= S) realloc();
-            void* m = (void*)iterator;
-            iterator += aligned_64(sz);
-            return m;
-        }
-        void reset(){
-            this->iterator = (char*)this->buffer+S;
-        }
-    protected:
-        void* buffer;
-        char* iterator;
-    };
-
-    template<size_t S, class Factory>
-    class private_region : public serial_region<S,Factory> {
-    public:
-        typedef serial_region<S,Factory> base;
-        void* malloc(size_t sz){
-            if(((size_t)this->iterator + sz - (size_t)this->buffer) >= S){
-                this->buffer = pool.provide();
+        template<size_t S, class Factory>
+        class serial_region {
+        public:
+            serial_region() {
+                this->buffer = NULL;
+                this->iterator = (char*)this->buffer + S;
+            }
+            void realloc() {
+                this->buffer = Factory::provide();
                 this->iterator = (char*)this->buffer;
             }
-            void* m = (void*)this->iterator;
-            this->iterator += aligned_64(sz);
-            return m;
-        }
-        void reset(){
-            base::reset();
-            pool.reset();
-        }
-    private:
-        Factory pool;
-    };
+            void* malloc(size_t sz) {
+                if (((size_t)iterator + sz - (size_t)this->buffer) >= S) realloc();
+                void* m = (void*)iterator;
+                iterator += aligned_64(sz);
+                return m;
+            }
+            void reset() {
+                this->iterator = (char*)this->buffer + S;
+            }
+        protected:
+            void* buffer;
+            char* iterator;
+        };
 
-    template<size_t S, class Factory>
-    class region : public serial_region<S,Factory> {
-    public:
-        typedef ambient::mutex mutex;
-        typedef ambient::guard<mutex> guard;
-        typedef serial_region<S,Factory> base;
+        template<size_t S, class Factory>
+        class private_region : public serial_region<S, Factory> {
+        public:
+            typedef serial_region<S, Factory> base;
+            void* malloc(size_t sz) {
+                if (((size_t)this->iterator + sz - (size_t)this->buffer) >= S) {
+                    this->buffer = pool.provide();
+                    this->iterator = (char*)this->buffer;
+                }
+                void* m = (void*)this->iterator;
+                this->iterator += aligned_64(sz);
+                return m;
+            }
+            void reset() {
+                base::reset();
+                pool.reset();
+            }
+        private:
+            Factory pool;
+        };
 
-        void* malloc(size_t sz){
-            guard g(this->mtx);
-            return base::malloc(sz);
-        }
-    private:
-        mutex mtx;
-    };
+        template<size_t S, class Factory>
+        class region : public serial_region<S, Factory> {
+        public:
+            typedef ambient::mutex mutex;
+            typedef ambient::guard<mutex> guard;
+            typedef serial_region<S, Factory> base;
 
-} }
+            void* malloc(size_t sz) {
+                guard g(this->mtx);
+                return base::malloc(sz);
+            }
+        private:
+            mutex mtx;
+        };
+
+    }
+}
 
 #endif

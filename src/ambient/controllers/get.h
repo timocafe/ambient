@@ -28,37 +28,39 @@
 #ifndef AMBIENT_CONTROLLERS_GET
 #define AMBIENT_CONTROLLERS_GET
 
-namespace ambient { namespace controllers {
-    
-    template<class T> class get {};
+namespace ambient {
+    namespace controllers {
 
-    template<>
-    class get<transformable> : public functor, public memory::cpu::use_bulk_new<get<transformable> > {
-    public:
-        template<class T> using collective = controller::channel_type::collective_type<T>;
-        static void spawn(transformable& v);
-        get(transformable& v);
-        virtual void invoke();
-        virtual bool ready();
-    private:
-        collective<transformable>* handle;
-    };
+        template<class T> class get {};
 
-    template<>
-    class get<revision> : public functor, public memory::cpu::use_bulk_new<get<revision> >  {
-    public:
-        template<class T> using collective = controller::channel_type::collective_type<T>;
-        static void spawn(revision& r);
-        get(revision& r);
-        virtual void invoke();
-        virtual bool ready();
-        void operator += (rank_t rank);
-    private:
-        collective<revision>* handle;
-        revision& t;
-    };
+        template<>
+        class get<transformable> : public functor, public memory::cpu::use_bulk_new<get<transformable> > {
+        public:
+            template<class T> using collective = controller::channel_type::collective_type<T>;
+            static void spawn(transformable& v);
+            get(transformable& v);
+            virtual void invoke();
+            virtual bool ready();
+        private:
+            collective<transformable>* handle;
+        };
 
-} }
+        template<>
+        class get<revision> : public functor, public memory::cpu::use_bulk_new<get<revision> >  {
+        public:
+            template<class T> using collective = controller::channel_type::collective_type<T>;
+            static void spawn(revision& r);
+            get(revision& r);
+            virtual void invoke();
+            virtual bool ready();
+            void operator += (rank_t rank);
+        private:
+            collective<revision>* handle;
+            revision& t;
+        };
+
+    }
+}
 
 #endif
 

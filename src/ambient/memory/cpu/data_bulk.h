@@ -28,20 +28,24 @@
 #ifndef AMBIENT_MEMORY_CPU_DATA_BULK_H
 #define AMBIENT_MEMORY_CPU_DATA_BULK_H
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    class data_bulk : public bulk {
-        data_bulk();
-    public:
-        static data_bulk& instance();
-        static void* soft_malloc(size_t s);
+            class data_bulk : public bulk {
+                data_bulk();
+            public:
+                static data_bulk& instance();
+                static void* soft_malloc(size_t s);
 
-        static void drop();
-    private:
-        region<AMBIENT_DATA_BULK_CHUNK, factory<AMBIENT_DATA_BULK_CHUNK> > memory;
-        size_t soft_limit;
-    };
+                static void drop();
+            private:
+                region<AMBIENT_DATA_BULK_CHUNK, factory<AMBIENT_DATA_BULK_CHUNK> > memory;
+                size_t soft_limit;
+            };
 
-} } }
+        }
+    }
+}
 
 #endif

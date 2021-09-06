@@ -31,28 +31,32 @@
 #include "utils/rss.hpp"
 #define DEFAULT_LIMIT 20
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    inline comm_bulk& comm_bulk::instance(){
-        static comm_bulk singleton; return singleton;
+            inline comm_bulk& comm_bulk::instance() {
+                static comm_bulk singleton; return singleton;
+            }
+
+            inline comm_bulk::comm_bulk() {
+                this->soft_limit = (ambient::isset("AMBIENT_COMM_BULK_LIMIT") ? ambient::getint("AMBIENT_COMM_BULK_LIMIT") : DEFAULT_LIMIT) *
+                    ((double)getRSSLimit() / AMBIENT_COMM_BULK_CHUNK / 100);
+            }
+
+            template<size_t S> void* comm_bulk::malloc() { return instance().memory.malloc(S); }
+            inline void* comm_bulk::malloc(size_t s) { return instance().memory.malloc(s); }
+
+            inline void comm_bulk::drop() {
+                instance().memory.reset();
+                if (instance().soft_limit < factory<AMBIENT_COMM_BULK_CHUNK>::size())
+                    factory<AMBIENT_COMM_BULK_CHUNK>::deallocate();
+                factory<AMBIENT_COMM_BULK_CHUNK>::reset();
+            }
+
+        }
     }
-
-    inline comm_bulk::comm_bulk(){
-        this->soft_limit = (ambient::isset("AMBIENT_COMM_BULK_LIMIT") ? ambient::getint("AMBIENT_COMM_BULK_LIMIT") : DEFAULT_LIMIT) * 
-                           ((double)getRSSLimit() / AMBIENT_COMM_BULK_CHUNK / 100);
-    }
-
-    template<size_t S> void* comm_bulk::malloc()         { return instance().memory.malloc(S); }
-                inline void* comm_bulk::malloc(size_t s) { return instance().memory.malloc(s); }
-
-    inline void comm_bulk::drop(){
-        instance().memory.reset();
-        if(instance().soft_limit < factory<AMBIENT_COMM_BULK_CHUNK>::size())
-            factory<AMBIENT_COMM_BULK_CHUNK>::deallocate();
-        factory<AMBIENT_COMM_BULK_CHUNK>::reset();
-    }
-
-} } }
+}
 
 #undef DEFAULT_LIMIT
 #endif

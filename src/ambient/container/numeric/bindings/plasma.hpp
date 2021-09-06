@@ -54,7 +54,7 @@ struct ul_type {
 
 template <class T>
 struct trans_helper {
-    const static int PlasmaTransValue = PlasmaTrans; 
+    const static int PlasmaTransValue = PlasmaTrans;
 };
 
 template <class T>
@@ -64,187 +64,191 @@ struct trans_helper<std::complex<T> > {
 
 extern "C" {
     int    CORE_dgeqrt(int M, int N, int IB,
-                       double *A, int LDA,
-                       double *T, int LDT,
-                       double *TAU, double *WORK);
+        double* A, int LDA,
+        double* T, int LDT,
+        double* TAU, double* WORK);
     int    CORE_zgeqrt(int M, int N, int IB,
-                       std::complex<double> *A, int LDA,
-                       std::complex<double> *T, int LDT,
-                       std::complex<double> *TAU, std::complex<double> *WORK);
+        std::complex<double>* A, int LDA,
+        std::complex<double>* T, int LDT,
+        std::complex<double>* TAU, std::complex<double>* WORK);
     int    CORE_dormqr(PLASMA_enum side, PLASMA_enum trans,
-                       int M, int N, int K, int IB,
-                       const double *V, int LDV,
-                       const double *T, int LDT,
-                       double *C, int LDC,
-                       double *WORK, int LDWORK);
+        int M, int N, int K, int IB,
+        const double* V, int LDV,
+        const double* T, int LDT,
+        double* C, int LDC,
+        double* WORK, int LDWORK);
     int    CORE_zunmqr(PLASMA_enum side, PLASMA_enum trans,
-                       int M, int N, int K, int IB,
-                       const std::complex<double> *V, int LDV,
-                       const std::complex<double> *T, int LDT,
-                       std::complex<double> *C, int LDC,
-                       std::complex<double> *WORK, int LDWORK);
+        int M, int N, int K, int IB,
+        const std::complex<double>* V, int LDV,
+        const std::complex<double>* T, int LDT,
+        std::complex<double>* C, int LDC,
+        std::complex<double>* WORK, int LDWORK);
     int    CORE_dtsqrt(int M, int N, int IB,
-                       double *A1, int LDA1,
-                       double *A2, int LDA2,
-                       double *T, int LDT,
-                       double *TAU, double *WORK);
+        double* A1, int LDA1,
+        double* A2, int LDA2,
+        double* T, int LDT,
+        double* TAU, double* WORK);
     int    CORE_ztsqrt(int M, int N, int IB,
-                       std::complex<double> *A1, int LDA1,
-                       std::complex<double> *A2, int LDA2,
-                       std::complex<double> *T, int LDT,
-                       std::complex<double> *TAU, std::complex<double> *WORK);
+        std::complex<double>* A1, int LDA1,
+        std::complex<double>* A2, int LDA2,
+        std::complex<double>* T, int LDT,
+        std::complex<double>* TAU, std::complex<double>* WORK);
     int    CORE_dtsmqr(PLASMA_enum side, PLASMA_enum trans,
-                       int M1, int N1, int M2, int N2, int K, int IB,
-                       double *A1, int LDA1,
-                       double *A2, int LDA2,
-                       const double *V, int LDV,
-                       const double *T, int LDT,
-                       double *WORK, int LDWORK);
+        int M1, int N1, int M2, int N2, int K, int IB,
+        double* A1, int LDA1,
+        double* A2, int LDA2,
+        const double* V, int LDV,
+        const double* T, int LDT,
+        double* WORK, int LDWORK);
     int    CORE_ztsmqr(PLASMA_enum side, PLASMA_enum trans,
-                       int M1, int N1, int M2, int N2, int K, int IB,
-                       std::complex<double> *A1, int LDA1,
-                       std::complex<double> *A2, int LDA2,
-                       const std::complex<double> *V, int LDV,
-                       const std::complex<double> *T, int LDT,
-                       std::complex<double> *WORK, int LDWORK);
+        int M1, int N1, int M2, int N2, int K, int IB,
+        std::complex<double>* A1, int LDA1,
+        std::complex<double>* A2, int LDA2,
+        const std::complex<double>* V, int LDV,
+        const std::complex<double>* T, int LDT,
+        std::complex<double>* WORK, int LDWORK);
     int    CORE_dgelqt(int M, int N, int IB,
-                       double *A, int LDA,
-                       double *T, int LDT,
-                       double *TAU,
-                       double *WORK);
+        double* A, int LDA,
+        double* T, int LDT,
+        double* TAU,
+        double* WORK);
     int    CORE_zgelqt(int M, int N, int IB,
-                       std::complex<double> *A, int LDA,
-                       std::complex<double> *T, int LDT,
-                       std::complex<double> *TAU,
-                       std::complex<double> *WORK);
+        std::complex<double>* A, int LDA,
+        std::complex<double>* T, int LDT,
+        std::complex<double>* TAU,
+        std::complex<double>* WORK);
     int    CORE_dormlq(PLASMA_enum side, PLASMA_enum trans,
-                       int M, int N, int IB, int K,
-                       const double *V, int LDV,
-                       const double *T, int LDT,
-                       double *C, int LDC,
-                       double *WORK, int LDWORK);
+        int M, int N, int IB, int K,
+        const double* V, int LDV,
+        const double* T, int LDT,
+        double* C, int LDC,
+        double* WORK, int LDWORK);
     int    CORE_zunmlq(PLASMA_enum side, PLASMA_enum trans,
-                       int M, int N, int IB, int K,
-                       const std::complex<double> *V, int LDV,
-                       const std::complex<double> *T, int LDT,
-                       std::complex<double> *C, int LDC,
-                       std::complex<double> *WORK, int LDWORK);
+        int M, int N, int IB, int K,
+        const std::complex<double>* V, int LDV,
+        const std::complex<double>* T, int LDT,
+        std::complex<double>* C, int LDC,
+        std::complex<double>* WORK, int LDWORK);
     int    CORE_dtslqt(int M, int N, int IB,
-                       double *A1, int LDA1,
-                       double *A2, int LDA2,
-                       double *T, int LDT,
-                       double *TAU, double *WORK);
+        double* A1, int LDA1,
+        double* A2, int LDA2,
+        double* T, int LDT,
+        double* TAU, double* WORK);
     int    CORE_ztslqt(int M, int N, int IB,
-                       std::complex<double> *A1, int LDA1,
-                       std::complex<double> *A2, int LDA2,
-                       std::complex<double> *T, int LDT,
-                       std::complex<double> *TAU, std::complex<double> *WORK);
+        std::complex<double>* A1, int LDA1,
+        std::complex<double>* A2, int LDA2,
+        std::complex<double>* T, int LDT,
+        std::complex<double>* TAU, std::complex<double>* WORK);
     int    CORE_dtsmlq(PLASMA_enum side, PLASMA_enum trans,
-                       int M1, int N1, int M2, int N2, int K, int IB,
-                       double *A1, int LDA1,
-                       double *A2, int LDA2,
-                       const double *V, int LDV,
-                       const double *T, int LDT,
-                       double *WORK, int LDWORK);
+        int M1, int N1, int M2, int N2, int K, int IB,
+        double* A1, int LDA1,
+        double* A2, int LDA2,
+        const double* V, int LDV,
+        const double* T, int LDT,
+        double* WORK, int LDWORK);
     int    CORE_ztsmlq(PLASMA_enum side, PLASMA_enum trans,
-                       int M1, int N1, int M2, int N2, int K, int IB,
-                       std::complex<double> *A1, int LDA1,
-                       std::complex<double> *A2, int LDA2,
-                       const std::complex<double> *V, int LDV,
-                       const std::complex<double> *T, int LDT,
-                       std::complex<double> *WORK, int LDWORK);
+        int M1, int N1, int M2, int N2, int K, int IB,
+        std::complex<double>* A1, int LDA1,
+        std::complex<double>* A2, int LDA2,
+        const std::complex<double>* V, int LDV,
+        const std::complex<double>* T, int LDT,
+        std::complex<double>* WORK, int LDWORK);
     void  CORE_dlaset2(PLASMA_enum uplo, int n1, int n2, double alpha,
-                       double *tileA, int ldtilea);
+        double* tileA, int ldtilea);
     void  CORE_zlaset2(PLASMA_enum uplo, int n1, int n2, std::complex<double> alpha,
-                       std::complex<double> *tileA, int ldtilea);
+        std::complex<double>* tileA, int ldtilea);
 }
 
-namespace ambient { inline namespace numeric { namespace plasma {
+namespace ambient {
+    inline namespace numeric {
+        namespace plasma {
 
-    template<class T>
-    struct lapack;
+            template<class T>
+            struct lapack;
 
-    template<>
-    struct lapack<double> {
-        typedef double T;
-        static void geqrt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work){
-            CORE_dgeqrt(m, n, ib, a, lda, t, ldt, tau, work);  
+            template<>
+            struct lapack<double> {
+                typedef double T;
+                static void geqrt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work) {
+                    CORE_dgeqrt(m, n, ib, a, lda, t, ldt, tau, work);
+                }
+
+                static void ormqr(int side, int trans, int m, int n, int k, int in, const T* a, int lda, const T* t, int ldt, T* c, int ldc, T* work, int ldwork) {
+                    CORE_dormqr(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
+                }
+
+                static void tsqrt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work) {
+                    CORE_dtsqrt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
+                }
+
+                static void tsmqr(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork) {
+                    CORE_dtsmqr(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
+                }
+
+                static void gelqt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work) {
+                    CORE_dgelqt(m, n, ib, a, lda, t, ldt, tau, work);
+                }
+
+                static void ormlq(int side, int trans, int m, int n, int k, int in, const T* a, int lda, const T* t, int ldt, T* c, int ldc, T* work, int ldwork) {
+                    CORE_dormlq(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
+                }
+
+                static void tslqt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work) {
+                    CORE_dtslqt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
+                }
+
+                static void tsmlq(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork) {
+                    CORE_dtsmlq(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
+                }
+
+                static void laset2(int uplo, int n1, int n2, T alfa, T* A, int lda) {
+                    CORE_dlaset2(uplo, n1, n2, alfa, A, lda);
+                }
+
+            };
+
+            template<>
+            struct lapack<std::complex<double> > {
+                typedef std::complex<double> T;
+                static void geqrt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work) {
+                    CORE_zgeqrt(m, n, ib, a, lda, t, ldt, tau, work);
+                }
+
+                static void ormqr(int side, int trans, int m, int n, int k, int in, const T* a, int lda, const T* t, int ldt, T* c, int ldc, T* work, int ldwork) {
+                    CORE_zunmqr(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
+                }
+
+                static void tsqrt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work) {
+                    CORE_ztsqrt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
+                }
+
+                static void tsmqr(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork) {
+                    CORE_ztsmqr(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
+                }
+
+                static void gelqt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work) {
+                    CORE_zgelqt(m, n, ib, a, lda, t, ldt, tau, work);
+                }
+
+                static void ormlq(int side, int trans, int m, int n, int k, int in, const T* a, int lda, const T* t, int ldt, T* c, int ldc, T* work, int ldwork) {
+                    CORE_zunmlq(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
+                }
+
+                static void tslqt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work) {
+                    CORE_ztslqt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
+                }
+
+                static void tsmlq(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork) {
+                    CORE_ztsmlq(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
+                }
+
+                static void laset2(int uplo, int n1, int n2, T alfa, T* A, int lda) {
+                    CORE_zlaset2(uplo, n1, n2, alfa, A, lda);
+                }
+            };
+
         }
-
-        static void ormqr(int side, int trans, int m, int n, int k, int in, const T *a, int lda, const T *t, int ldt, T *c, int ldc, T *work, int ldwork){
-            CORE_dormqr(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
-        }
-       
-        static void tsqrt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work){
-            CORE_dtsqrt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
-        }
-
-        static void tsmqr(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork){
-            CORE_dtsmqr(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
-        }
-
-        static void gelqt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work){
-            CORE_dgelqt(m, n, ib, a, lda, t, ldt, tau, work);  
-        }
-
-        static void ormlq(int side, int trans, int m, int n, int k, int in, const T *a, int lda, const T *t, int ldt, T *c, int ldc, T *work, int ldwork){
-            CORE_dormlq(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
-        }
-
-        static void tslqt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work){
-            CORE_dtslqt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
-        }
-
-        static void tsmlq(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork){
-            CORE_dtsmlq(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
-        }
-
-        static void laset2(int uplo, int n1, int n2, T alfa, T* A, int lda){
-            CORE_dlaset2(uplo, n1, n2, alfa, A, lda);
-        }
-
-    };
-
-    template<>
-    struct lapack<std::complex<double> > {
-        typedef std::complex<double> T;
-        static void geqrt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work){
-            CORE_zgeqrt(m, n, ib, a, lda, t, ldt, tau, work);  
-        }
-
-        static void ormqr(int side, int trans, int m, int n, int k, int in, const T *a, int lda, const T *t, int ldt, T *c, int ldc, T *work, int ldwork){
-            CORE_zunmqr(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
-        }
-
-        static void tsqrt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work){
-            CORE_ztsqrt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
-        }
-
-        static void tsmqr(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork){
-            CORE_ztsmqr(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
-        }
-
-        static void gelqt(int m, int n, int ib, T* a, int lda, T* t, int ldt, T* tau, T* work){
-            CORE_zgelqt(m, n, ib, a, lda, t, ldt, tau, work);  
-        }
-
-        static void ormlq(int side, int trans, int m, int n, int k, int in, const T *a, int lda, const T *t, int ldt, T *c, int ldc, T *work, int ldwork){
-            CORE_zunmlq(side, trans, m, n, k, in, a, lda, t, ldt, c, ldc, work, ldwork);
-        }
-
-        static void tslqt(int m, int n, int ib, T* a1, int lda1, T* a2, int lda2, T* t, int ldt, T* tau, T* work){
-            CORE_ztslqt(m, n, ib, a1, lda1, a2, lda2, t, ldt, tau, work);
-        }
-
-        static void tsmlq(int side, int trans, int m1, int n1, int m2, int n2, int k, int ib, T* a1, int lda1, T* a2, int lda2, T* v, int ldv, T* t, int ldt, T* work, int ldwork){
-            CORE_ztsmlq(side, trans, m1, n1, m2, n2, k, ib, a1, lda1, a2, lda2, v, ldv, t, ldt, work, ldwork);
-        }
-
-        static void laset2(int uplo, int n1, int n2, T alfa, T* A, int lda){
-            CORE_zlaset2(uplo, n1, n2, alfa, A, lda);
-        }
-    };
-
-} } }
+    }
+}
 
 #endif

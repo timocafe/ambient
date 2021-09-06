@@ -30,16 +30,16 @@
 
 namespace ambient {
 
-    template<class T> auto dereference(T a) -> decltype(*a){ return *a; }
-    inline int dereference(int a){ return a; }
+    template<class T> auto dereference(T a) -> decltype(*a) { return *a; }
+    inline int dereference(int a) { return a; }
 
     template<class InputIterator, class Function>
-    void threaded_for_each(InputIterator first, InputIterator last, Function fn){
-        int dist = last-first;
+    void threaded_for_each(InputIterator first, InputIterator last, Function fn) {
+        int dist = last - first;
         ambient::backbone::divergence_guard g(dist);
-        AMBIENT_PARALLEL_FOR(int i = 0; i < dist; i++){
+        AMBIENT_PARALLEL_FOR(int i = 0; i < dist; i++) {
             ambient::select().diverge(i);
-            fn(dereference(first+i));
+            fn(dereference(first + i));
         }
     }
 

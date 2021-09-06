@@ -29,21 +29,21 @@
 #define AMBIENT_UTILS_RANK_TYPE
 
 namespace ambient {
-    #if 0
+#if 0
     class rank_t {
     public:
-        rank_t(){}
+        rank_t() {}
         rank_t(int r) : rank(r) {}
         bool operator != (const rank_t& other) const { return (rank != other.rank); }
         bool operator == (const rank_t& other) const { return (rank == other.rank); }
-        bool operator <  (const rank_t& other) const { return (rank < other.rank);  }
-        bool operator >  (const rank_t& other) const { return (rank > other.rank);  }
+        bool operator <  (const rank_t& other) const { return (rank < other.rank); }
+        bool operator >  (const rank_t& other) const { return (rank > other.rank); }
         int& toint() const { return rank; }
         mutable int rank; // mutable due to MPI
     };
-    #else
+#else
     typedef int rank_t;
-    #endif
+#endif
 }
 
 #endif

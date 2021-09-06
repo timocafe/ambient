@@ -28,14 +28,18 @@
 #ifndef AMBIENT_MEMORY_CPU_STANDARD_HPP
 #define AMBIENT_MEMORY_CPU_STANDARD_HPP
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    struct standard {
-        static void* malloc(size_t sz){ return std::malloc(sz); }
-        static void free(void* ptr){ std::free(ptr);  }
-        static constexpr int signature = serial_id<cpu::standard>();
-    };
+            struct standard {
+                static void* malloc(size_t sz) { return std::malloc(sz); }
+                static void free(void* ptr) { std::free(ptr); }
+                static constexpr int signature = serial_id<cpu::standard>();
+            };
 
-} } }
+        }
+    }
+}
 
 #endif

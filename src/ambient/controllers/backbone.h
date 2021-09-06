@@ -33,7 +33,7 @@ namespace ambient {
     class backbone : public context {
         backbone(const backbone&) = delete;
         backbone& operator=(const backbone&) = delete;
-        backbone(); 
+        backbone();
     private:
         typedef typename context::controller_type controller_type;
         utils::funneled_io io_guard;
@@ -43,7 +43,7 @@ namespace ambient {
         int tag_ub;
         int sid;
     public:
-       ~backbone();
+        ~backbone();
         controller_type* activate(actor* a);
         void deactivate(actor* a);
         void sync();
@@ -71,7 +71,7 @@ namespace ambient {
     };
 
     template<class T> backbone backbone::weak_instance<T>::w;
-    inline backbone& select(){ return backbone::weak_instance<void>::w; }
+    inline backbone& select() { return backbone::weak_instance<void>::w; }
 }
 
 #endif

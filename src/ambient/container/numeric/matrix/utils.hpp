@@ -27,96 +27,96 @@
 
 #ifndef AMBIENT_CONTAINER_NUMERIC_UTILS
 #define AMBIENT_CONTAINER_NUMERIC_UTILS
-    
+
 namespace ambient {
 
     template<class Matrix, int IB>
-    inline void touch(const tiles<Matrix, IB>& a){
+    inline void touch(const tiles<Matrix, IB>& a) {
         int size = a.num_tiles();
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             touch(a[i]);
         }
     }
 
     template<class Matrix, int IB>
-    inline void migrate(const tiles<Matrix, IB>& a){
+    inline void migrate(const tiles<Matrix, IB>& a) {
         tiles<Matrix, IB>& m = const_cast<tiles<Matrix, IB>&>(a);
         int size = m.num_tiles();
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             migrate(m[i]);
         }
     }
 
     template<class Matrix, int IB>
-    inline void hint(const tiles<Matrix, IB>& a){
+    inline void hint(const tiles<Matrix, IB>& a) {
         int size = a.num_tiles();
-        for(int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             hint(a[i]);
         }
     }
 
     template<class Matrix, int IB>
-    inline rank_t get_owner(const tiles<Matrix, IB>& a){
+    inline rank_t get_owner(const tiles<Matrix, IB>& a) {
         return ambient::get_owner(a[0]);
     }
 
     template<class InputIterator, class Function, class Weight>
-    void for_each_redist(InputIterator first, InputIterator last, Function op, Weight weight){
-        typedef std::pair<double,size_t> pair;
-        size_t range = last-first;
+    void for_each_redist(InputIterator first, InputIterator last, Function op, Weight weight) {
+        typedef std::pair<double, size_t> pair;
+        size_t range = last - first;
         size_t np = ambient::num_procs();
         double avg = 0.;
 
-        if(range < np) return; // one element per proc
-        std::vector<pair> wl(np, std::make_pair(0,0));
+        if (range < np) return; // one element per proc
+        std::vector<pair> wl(np, std::make_pair(0, 0));
         std::vector<pair> cx; cx.reserve(range);
-        
+
         // calculating complexities of the calls
-        for(InputIterator it = first; it != last; ++it){
-            cx.push_back(std::make_pair(weight(*it), it-first));
+        for (InputIterator it = first; it != last; ++it) {
+            cx.push_back(std::make_pair(weight(*it), it - first));
             avg += cx.back().first;
         }
         avg /= np;
-        std::sort(cx.begin(), cx.end(), 
-                  [](const pair& a, const pair& b){ return a.first < b.first; });
-        
+        std::sort(cx.begin(), cx.end(),
+            [](const pair& a, const pair& b) { return a.first < b.first; });
+
         // filling the workload with smallest local parts first
-        for(size_t p = 0; p < np; ++p){
+        for (size_t p = 0; p < np; ++p) {
             wl[p].second = p;
-            ambient::actor proc(ambient::scope::begin()+p);
-            for(size_t i = 0; i < range; ++i){
+            ambient::actor proc(ambient::scope::begin() + p);
+            for (size_t i = 0; i < range; ++i) {
                 size_t k = cx[i].second;
-                if(ambient::get_owner(*(first+k)) != p) continue;
-                if(wl[p].first + cx[i].first >= avg) continue;
-                op(*(first+k)); 
-                wl[p].first += cx[i].first; 
+                if (ambient::get_owner(*(first + k)) != p) continue;
+                if (wl[p].first + cx[i].first >= avg) continue;
+                op(*(first + k));
+                wl[p].first += cx[i].first;
                 cx[i].first = 0;
             }
         }
         // rebalancing using difference with average
-        for(size_t p = 0; p < np; ++p){
-            ambient::actor proc(ambient::scope::begin()+p);
-            for(size_t i = 0; i < range; ++i){
-                if(cx[i].first == 0) continue;
-                if(wl[p].first + cx[i].first >= avg) break;
-                op(*(first+cx[i].second)); 
-                wl[p].first += cx[i].first; 
+        for (size_t p = 0; p < np; ++p) {
+            ambient::actor proc(ambient::scope::begin() + p);
+            for (size_t i = 0; i < range; ++i) {
+                if (cx[i].first == 0) continue;
+                if (wl[p].first + cx[i].first >= avg) break;
+                op(*(first + cx[i].second));
+                wl[p].first += cx[i].first;
                 cx[i].first = 0;
             }
         }
-        std::sort(wl.begin(), wl.end(), 
-                  [](const pair& a, const pair& b){ return a.first < b.first; });
-        
+        std::sort(wl.begin(), wl.end(),
+            [](const pair& a, const pair& b) { return a.first < b.first; });
+
         // placing the rest according to sorted workload
         size_t p = 0;
-        for(int i = range-1; i >= 0; --i){
-            if(cx[i].first == 0) continue;
-            ambient::actor proc(ambient::scope::begin()+wl[p++].second);
-            op(*(first+cx[i].second)); 
+        for (int i = range - 1; i >= 0; --i) {
+            if (cx[i].first == 0) continue;
+            ambient::actor proc(ambient::scope::begin() + wl[p++].second);
+            op(*(first + cx[i].second));
             p %= np;
         }
     }
-            
+
 }
 
 #endif

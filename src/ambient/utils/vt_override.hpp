@@ -33,10 +33,10 @@ namespace ambient {
     template<class T>
     class allow_vt_override {
     public:
-        void* operator new (size_t size, void* ptr){ return ptr; }
-        void  operator delete (void*, void*){ /* doesn't throw */ }
-        void* operator new (size_t sz){ return ambient::memory::malloc<ambient::memory::cpu::fixed,T>(); }
-        void operator delete (void* ptr){ ambient::memory::free<ambient::memory::cpu::fixed,sizeof(T)>(ptr); }
+        void* operator new (size_t size, void* ptr) { return ptr; }
+        void  operator delete (void*, void*) { /* doesn't throw */ }
+        void* operator new (size_t sz) { return ambient::memory::malloc<ambient::memory::cpu::fixed, T>(); }
+        void operator delete (void* ptr) { ambient::memory::free<ambient::memory::cpu::fixed, sizeof(T)>(ptr); }
     };
 
 }

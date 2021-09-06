@@ -28,22 +28,26 @@
 #ifndef AMBIENT_MEMORY_CPU_NEW_H
 #define AMBIENT_MEMORY_CPU_NEW_H
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    template<class T>
-    class use_fixed_new {
-    public:
-        void* operator new (size_t sz);
-        void operator delete (void* ptr);
-    };
+            template<class T>
+            class use_fixed_new {
+            public:
+                void* operator new (size_t sz);
+                void operator delete (void* ptr);
+            };
 
-    template<class T>
-    class use_bulk_new {
-    public:
-        void* operator new (size_t sz);
-        void operator delete (void* ptr);
-    };
+            template<class T>
+            class use_bulk_new {
+            public:
+                void* operator new (size_t sz);
+                void operator delete (void* ptr);
+            };
 
-} } }
+        }
+    }
+}
 
 #endif

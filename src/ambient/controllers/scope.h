@@ -42,7 +42,7 @@ namespace ambient {
         static size_t size();
         static const_iterator begin();
         static const_iterator end();
-       ~scope();
+        ~scope();
         scope(const_iterator first, const_iterator last);
         scope(const_iterator first, size_t size);
     private:

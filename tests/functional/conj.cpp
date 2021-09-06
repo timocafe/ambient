@@ -1,8 +1,8 @@
 #include "utils/testing.hpp"
 
-TEST_CASE( "Conjugate is computed", "[conj]" )
+TEST_CASE("Conjugate is computed", "[conj]")
 {
-    matrix<std::complex<double> >  A (TEST_M, TEST_N);
+    matrix<std::complex<double> >  A(TEST_M, TEST_N);
     matrix<std::complex<double> >  A_(TEST_M, TEST_N);
 
     generate(A);

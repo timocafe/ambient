@@ -1,6 +1,6 @@
 #include "utils/testing.hpp"
 
-TEST_CASE( "Matrix LQ factorization performance measured", "[ambient::lq]" )
+TEST_CASE("Matrix LQ factorization performance measured", "[ambient::lq]")
 {
     measurement params;
     size_t x = params.num_cols();
@@ -13,7 +13,7 @@ TEST_CASE( "Matrix LQ factorization performance measured", "[ambient::lq]" )
     generate(A);
     ambient::sync();
 
-    lq(A, L, Q); 
+    lq(A, L, Q);
 
     measurement::timer time("lq"); time.begin();
     ambient::sync();

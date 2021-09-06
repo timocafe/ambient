@@ -41,66 +41,68 @@
 #include "ambient/memory/cpu/standard.hpp"
 #include "ambient/memory/cpu/fixed.hpp"
 
-namespace ambient { namespace memory {
+namespace ambient {
+    namespace memory {
 
-    struct descriptor {
-        typedef int memory_id_type;
+        struct descriptor {
+            typedef int memory_id_type;
 
-        descriptor(size_t e, memory_id_type r = cpu::standard::signature) : extent(e), signature(r), persistency(1), crefs(1) {}
+            descriptor(size_t e, memory_id_type r = cpu::standard::signature) : extent(e), signature(r), persistency(1), crefs(1) {}
 
-        void protect(){
-            if(!(persistency++)) signature = cpu::standard::signature;
-        }
-        void weaken(){
-            if(!(--persistency)) signature = cpu::bulk::signature;
-        }
-        void reuse(descriptor& d){
-            signature = d.signature;
-            d.signature = delegated::signature;
-        }
-        bool conserves(descriptor& p){
-            assert(p.signature != delegated::signature && signature != delegated::signature);
-            return (!p.bulked() || bulked());
-        }
-        bool bulked(){
-            return (signature == cpu::bulk::signature);
-        }
-        size_t extent;
-        memory_id_type signature;
-        int persistency;
-        int crefs;
-    };
+            void protect() {
+                if (!(persistency++)) signature = cpu::standard::signature;
+            }
+            void weaken() {
+                if (!(--persistency)) signature = cpu::bulk::signature;
+            }
+            void reuse(descriptor& d) {
+                signature = d.signature;
+                d.signature = delegated::signature;
+            }
+            bool conserves(descriptor& p) {
+                assert(p.signature != delegated::signature && signature != delegated::signature);
+                return (!p.bulked() || bulked());
+            }
+            bool bulked() {
+                return (signature == cpu::bulk::signature);
+            }
+            size_t extent;
+            memory_id_type signature;
+            int persistency;
+            int crefs;
+        };
 
-    template<class Memory>           static void* malloc(size_t sz){ return Memory::malloc(sz);            }
-    template<class Memory, size_t S> static void* malloc()         { return Memory::template malloc<S>();  }
-    template<class Memory, class  T> static void* malloc()         { return malloc<Memory, sizeof(T)>();   }
-    template<class Memory>           static void* calloc(size_t sz){ return Memory::calloc(sz);            }
-    template<class Memory, size_t S> static void* calloc()         { return Memory::template calloc<S>();  }
-    template<class Memory, class  T> static void* calloc()         { return calloc<Memory, sizeof(T)>();   }
-    template<class Memory>           static void free(void* ptr)   { return Memory::free(ptr);             }
-    template<class Memory, size_t S> static void free(void* ptr)   { return Memory::template free<S>(ptr); }
-    template<class Memory, class  T> static void free(void* ptr)   { return free<Memory, sizeof(T)>(ptr);  }
+        template<class Memory>           static void* malloc(size_t sz) { return Memory::malloc(sz); }
+        template<class Memory, size_t S> static void* malloc() { return Memory::template malloc<S>(); }
+        template<class Memory, class  T> static void* malloc() { return malloc<Memory, sizeof(T)>(); }
+        template<class Memory>           static void* calloc(size_t sz) { return Memory::calloc(sz); }
+        template<class Memory, size_t S> static void* calloc() { return Memory::template calloc<S>(); }
+        template<class Memory, class  T> static void* calloc() { return calloc<Memory, sizeof(T)>(); }
+        template<class Memory>           static void free(void* ptr) { return Memory::free(ptr); }
+        template<class Memory, size_t S> static void free(void* ptr) { return Memory::template free<S>(ptr); }
+        template<class Memory, class  T> static void free(void* ptr) { return free<Memory, sizeof(T)>(ptr); }
 
-    template<class Memory>
-    static void* malloc(descriptor& d){
-        d.signature = Memory::signature;
-        return Memory::malloc(d.extent);
+        template<class Memory>
+        static void* malloc(descriptor& d) {
+            d.signature = Memory::signature;
+            return Memory::malloc(d.extent);
+        }
+
+        static void* malloc(descriptor& d) {
+            assert(d.signature != delegated::signature);
+            if (d.signature == cpu::bulk::signature) {
+                void* ptr = cpu::data_bulk::soft_malloc(d.extent);
+                if (ptr) return ptr;
+                d.signature = cpu::standard::signature;
+            }
+            return malloc<cpu::standard>(d.extent);
+        }
+        static void free(void* ptr, descriptor& d) {
+            if (ptr == NULL || d.signature == delegated::signature) return;
+            if (d.signature == cpu::standard::signature) free<cpu::standard>(ptr);
+        }
+
     }
-
-    static void* malloc(descriptor& d){
-        assert(d.signature != delegated::signature);
-        if(d.signature == cpu::bulk::signature){
-            void* ptr = cpu::data_bulk::soft_malloc(d.extent);
-            if(ptr) return ptr;
-            d.signature = cpu::standard::signature;
-        }
-        return malloc<cpu::standard>(d.extent);
-    }
-    static void free(void* ptr, descriptor& d){ 
-        if(ptr == NULL || d.signature == delegated::signature) return;
-        if(d.signature == cpu::standard::signature) free<cpu::standard>(ptr);
-    }
-
-} }
+}
 
 #endif

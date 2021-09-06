@@ -30,52 +30,52 @@
 
 namespace ambient {
 
-        inline bool scope::nested(){
-            return ambient::select().has_nested_actor();
+    inline bool scope::nested() {
+        return ambient::select().has_nested_actor();
+    }
+    inline bool scope::local() {
+        return ambient::select().get_actor().local();
+    }
+    inline scope::const_iterator scope::balance(int k, int max_k) {
+        int capacity = scope::size();
+        if (max_k > capacity) {
+            int k_ = k / ((int)(max_k / capacity));
+            if (k_ < capacity) k = k_;
         }
-        inline bool scope::local(){
-            return ambient::select().get_actor().local();
-        }
-        inline scope::const_iterator scope::balance(int k, int max_k){
-            int capacity = scope::size();
-            if(max_k > capacity){
-                int k_ = k/((int)(max_k / capacity));
-                if(k_ < capacity) k = k_;
-            }
-            return scope::begin() + k % capacity;
-        }
-        inline scope::const_iterator scope::permute(int k, const std::vector<int>& s, size_t granularity){
-            if(k >= s.size()) throw std::runtime_error("Error: permutation overflow!");
-            if(granularity > scope::size()) granularity = 1;
-            return scope::begin() + granularity * (s[k] % (scope::size() / granularity));
-        }
-        inline scope& scope::top(){
-            return ambient::select().get_scope();
-        }
-        inline scope::const_iterator scope::begin(){
-            return top().provision.begin();
-        }
-        inline scope::const_iterator scope::end(){
-            return top().provision.end();
-        }
-        inline size_t scope::size(){
-            return top().provision.size();
-        }
-        inline scope::~scope(){
-            ambient::select().pop_scope();
-        }
-        inline scope::scope(const_iterator first, const_iterator last){
-            for(const_iterator it = first; it != last; it++) provision.push_back(*it);
-            ambient::select().push_scope(this);
-        }
-        inline scope::scope(const_iterator first, size_t size){
-            const_iterator last = first + std::min(ambient::scope::size(),size);
-            for(const_iterator it = first; it != last; it++) provision.push_back(*it);
-            ambient::select().push_scope(this);
-        }
-        inline scope::scope(size_t np){
-            for(int i = 0; i < np; i++) provision.push_back(i);
-        }
+        return scope::begin() + k % capacity;
+    }
+    inline scope::const_iterator scope::permute(int k, const std::vector<int>& s, size_t granularity) {
+        if (k >= s.size()) throw std::runtime_error("Error: permutation overflow!");
+        if (granularity > scope::size()) granularity = 1;
+        return scope::begin() + granularity * (s[k] % (scope::size() / granularity));
+    }
+    inline scope& scope::top() {
+        return ambient::select().get_scope();
+    }
+    inline scope::const_iterator scope::begin() {
+        return top().provision.begin();
+    }
+    inline scope::const_iterator scope::end() {
+        return top().provision.end();
+    }
+    inline size_t scope::size() {
+        return top().provision.size();
+    }
+    inline scope::~scope() {
+        ambient::select().pop_scope();
+    }
+    inline scope::scope(const_iterator first, const_iterator last) {
+        for (const_iterator it = first; it != last; it++) provision.push_back(*it);
+        ambient::select().push_scope(this);
+    }
+    inline scope::scope(const_iterator first, size_t size) {
+        const_iterator last = first + std::min(ambient::scope::size(), size);
+        for (const_iterator it = first; it != last; it++) provision.push_back(*it);
+        ambient::select().push_scope(this);
+    }
+    inline scope::scope(size_t np) {
+        for (int i = 0; i < np; i++) provision.push_back(i);
+    }
 }
 
 #endif

@@ -1,6 +1,6 @@
 #include "utils/testing.hpp"
 
-TEST_CASE( "Matrix QR factorization performance measured", "[ambient::qr]" )
+TEST_CASE("Matrix QR factorization performance measured", "[ambient::qr]")
 {
     measurement params;
     size_t x = params.num_cols();
@@ -13,7 +13,7 @@ TEST_CASE( "Matrix QR factorization performance measured", "[ambient::qr]" )
     generate(A);
     ambient::sync();
 
-    qr(A,  Q,  R); 
+    qr(A, Q, R);
 
     measurement::timer time("qr"); time.begin();
     ambient::sync();

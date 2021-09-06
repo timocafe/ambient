@@ -31,30 +31,34 @@
 #include "utils/rss.hpp"
 #define DEFAULT_LIMIT 10
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    inline data_bulk& data_bulk::instance(){
-        static data_bulk singleton; return singleton;
+            inline data_bulk& data_bulk::instance() {
+                static data_bulk singleton; return singleton;
+            }
+
+            inline data_bulk::data_bulk() {
+                this->soft_limit = (ambient::isset("AMBIENT_DATA_BULK_LIMIT") ? ambient::getint("AMBIENT_DATA_BULK_LIMIT") : DEFAULT_LIMIT) *
+                    ((double)getRSSLimit() / AMBIENT_DATA_BULK_CHUNK / 100);
+            }
+
+            inline void* data_bulk::soft_malloc(size_t s) {
+                if (instance().soft_limit < factory<AMBIENT_DATA_BULK_CHUNK>::size() || s > AMBIENT_DATA_BULK_CHUNK) return NULL;
+                return instance().memory.malloc(s);
+            }
+
+            inline void data_bulk::drop() {
+                instance().memory.reset();
+                if (instance().soft_limit < factory<AMBIENT_DATA_BULK_CHUNK>::size())
+                    factory<AMBIENT_DATA_BULK_CHUNK>::deallocate();
+                factory<AMBIENT_DATA_BULK_CHUNK>::reset();
+            }
+
+        }
     }
-
-    inline data_bulk::data_bulk(){
-        this->soft_limit = (ambient::isset("AMBIENT_DATA_BULK_LIMIT") ? ambient::getint("AMBIENT_DATA_BULK_LIMIT") : DEFAULT_LIMIT) * 
-                           ((double)getRSSLimit() / AMBIENT_DATA_BULK_CHUNK / 100);
-    }
-
-    inline void* data_bulk::soft_malloc(size_t s){
-        if(instance().soft_limit < factory<AMBIENT_DATA_BULK_CHUNK>::size() || s > AMBIENT_DATA_BULK_CHUNK) return NULL;
-        return instance().memory.malloc(s);
-    }
-
-    inline void data_bulk::drop(){
-        instance().memory.reset();
-        if(instance().soft_limit < factory<AMBIENT_DATA_BULK_CHUNK>::size())
-            factory<AMBIENT_DATA_BULK_CHUNK>::deallocate();
-        factory<AMBIENT_DATA_BULK_CHUNK>::reset();
-    }
-
-} } }
+}
 
 #undef DEFAULT_LIMIT
 #endif

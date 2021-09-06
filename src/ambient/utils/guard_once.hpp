@@ -33,7 +33,7 @@ namespace ambient {
     class guard_once {
     public:
         guard_once() : once(false) { }
-        bool operator()(){ if(!once){ once = true; return true; } return false; }
+        bool operator()() { if (!once) { once = true; return true; } return false; }
     private:
         bool once;
     };

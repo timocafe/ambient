@@ -25,33 +25,35 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-namespace ambient { namespace model {
+namespace ambient {
+    namespace model {
 
-    inline history::history(dim2 dim, size_t ts) : current(NULL), dim(dim), extent(ambient::memory::aligned_64(dim.square()*ts)) { }
+        inline history::history(dim2 dim, size_t ts) : current(NULL), dim(dim), extent(ambient::memory::aligned_64(dim.square()* ts)) { }
 
-    inline void history::init_state(){
-        revision* r = new revision(extent, NULL, locality::common, ambient::rank());
-        this->current = r;
+        inline void history::init_state() {
+            revision* r = new revision(extent, NULL, locality::common, ambient::rank());
+            this->current = r;
+        }
+
+        template<locality L>
+        inline void history::add_state(functor* g) {
+            revision* r = new revision(extent, g, L, ambient::rank());
+            this->current = r;
+        }
+
+        template<locality L>
+        inline void history::add_state(rank_t g) {
+            revision* r = new revision(extent, NULL, L, g);
+            this->current = r;
+        }
+
+        inline revision* history::back() const {
+            return this->current;
+        }
+
+        inline bool history::weak() const {
+            return (this->back() == NULL);
+        }
+
     }
-
-    template<locality L>
-    inline void history::add_state(functor* g){
-        revision* r = new revision(extent, g, L, ambient::rank());
-        this->current = r;
-    }
-
-    template<locality L>
-    inline void history::add_state(rank_t g){
-        revision* r = new revision(extent, NULL, L, g);
-        this->current = r;
-    }
-
-    inline revision* history::back() const {
-        return this->current;
-    }
-
-    inline bool history::weak() const {
-        return (this->back() == NULL);
-    }
-
-} }
+}

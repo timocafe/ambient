@@ -34,9 +34,9 @@ namespace ambient {
     class actor {
     protected:
         typedef controllers::controller controller_type;
-        actor(){}
+        actor() {}
     public:
-       ~actor();
+        ~actor();
         actor(scope::const_iterator it);
         bool remote() const;
         bool local()  const;

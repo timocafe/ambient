@@ -28,19 +28,19 @@
 #ifndef AMBIENT_CONTAINER_VECTOR_HPP
 #define AMBIENT_CONTAINER_VECTOR_HPP
 
-/* The actual implementation of vector is separated into two classes: vector and vector_async.
- * For the purpose of flexibility they both share the same interface but the limitations have to be noted.
- *
- * vector (a high-level wrapper to provide user-space interface to compose async calls):
- *
- *    - cached size: unlike capacity, the size of the vector might be changed asynchroneously (invoke measure() to refresh cached value).
- *    - data-access: discouraged due to performance reasons but is possible if to invoke load() first.
- *
- * vector_async (is used for the actual data-access inside async calls):
- *
- *    - capacity: can't be changed in async mode (so methods changing the size will fail if it's reached).
- *    - please check the list of allowed calls in vector_async.h.
- */
+ /* The actual implementation of vector is separated into two classes: vector and vector_async.
+  * For the purpose of flexibility they both share the same interface but the limitations have to be noted.
+  *
+  * vector (a high-level wrapper to provide user-space interface to compose async calls):
+  *
+  *    - cached size: unlike capacity, the size of the vector might be changed asynchroneously (invoke measure() to refresh cached value).
+  *    - data-access: discouraged due to performance reasons but is possible if to invoke load() first.
+  *
+  * vector_async (is used for the actual data-access inside async calls):
+  *
+  *    - capacity: can't be changed in async mode (so methods changing the size will fail if it's reached).
+  *    - please check the list of allowed calls in vector_async.h.
+  */
 
 #include "ambient/container/vector/vector.hpp"
 #include "ambient/container/vector/vector_async.hpp"

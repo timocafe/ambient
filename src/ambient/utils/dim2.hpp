@@ -28,17 +28,17 @@
 #ifndef AMBIENT_UTILS_DIM2
 #define AMBIENT_UTILS_DIM2
 
-namespace ambient{
+namespace ambient {
 
     struct dim2 {
         size_t x, y;
-        dim2() 
-        : x(0), y(0) 
+        dim2()
+            : x(0), y(0)
         {
         }
 
-        dim2(size_t x, size_t y) 
-        : x(x), y(y) 
+        dim2(size_t x, size_t y)
+            : x(x), y(y)
         {
         }
 
@@ -54,20 +54,20 @@ namespace ambient{
             return this->x * this->y;
         }
 
-        dim2& operator=(int value){
+        dim2& operator=(int value) {
             this->x = this->y = value;
             return *this;
         }
 
-        dim2& operator*=(const dim2 & b){
+        dim2& operator*=(const dim2& b) {
             this->x *= b.x;
             this->y *= b.y;
             return *this;
         }
 
-        size_t operator*(const dim2 & b) const { // multiplication of all components
+        size_t operator*(const dim2& b) const { // multiplication of all components
             return this->x * b.x *
-                   this->y * b.y ;
+                this->y * b.y;
         }
 
         bool operator==(int value) const {
@@ -87,11 +87,11 @@ namespace ambient{
         }
 
         bool operator<(dim2 m) const {
-            return (x < m.x && y < m.y);
+            return (x < m.x&& y < m.y);
         }
 
         bool operator<(size_t m) const {
-            return (x < m && y < m);
+            return (x < m&& y < m);
         }
 
         bool operator>(dim2 m) const {

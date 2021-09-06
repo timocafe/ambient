@@ -28,20 +28,22 @@
 #ifndef AMBIENT_CONTROLLERS_META
 #define AMBIENT_CONTROLLERS_META
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    class meta : public functor, public memory::cpu::use_bulk_new<meta> {
-    public:
-        enum class type { get, set };
-        static void spawn(revision& r, type t);
-        meta(revision& r, rank_t w, type t);
-        virtual void invoke();
-        virtual bool ready();
-        revision& r;
-        rank_t which;
-        type t;
-    };
+        class meta : public functor, public memory::cpu::use_bulk_new<meta> {
+        public:
+            enum class type { get, set };
+            static void spawn(revision& r, type t);
+            meta(revision& r, rank_t w, type t);
+            virtual void invoke();
+            virtual bool ready();
+            revision& r;
+            rank_t which;
+            type t;
+        };
 
-} }
+    }
+}
 
 #endif

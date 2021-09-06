@@ -25,53 +25,55 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-namespace ambient { namespace model {
+namespace ambient {
+    namespace model {
 
-    inline revision::revision(size_t extent, functor* g, locality l, rank_t owner)
-    : spec(extent), generator(g), state(l), 
-      data(NULL), users(0), owner(owner)
-    {
+        inline revision::revision(size_t extent, functor* g, locality l, rank_t owner)
+            : spec(extent), generator(g), state(l),
+            data(NULL), users(0), owner(owner)
+        {
+        }
+
+        inline void revision::embed(void* ptr) {
+            data = ptr;
+        }
+
+        inline void revision::reuse(revision& r) {
+            data = r.data;
+            spec.reuse(r.spec);
+        }
+
+        inline void revision::use() {
+            ++users;
+        }
+
+        inline void revision::release() {
+            --users;
+        }
+
+        inline void revision::complete() {
+            generator = NULL;
+        }
+
+        inline void revision::invalidate() {
+            data = NULL;
+        }
+
+        inline bool revision::locked() const {
+            return (users != 0);
+        }
+
+        inline bool revision::locked_once() const {
+            return (users == 1);
+        }
+
+        inline bool revision::valid() const {
+            return (data != NULL);
+        }
+
+        inline bool revision::referenced() const {
+            return (spec.crefs != 0);
+        }
+
     }
-
-    inline void revision::embed(void* ptr){
-        data = ptr;
-    }
-
-    inline void revision::reuse(revision& r){
-        data = r.data;
-        spec.reuse(r.spec);
-    }
-
-    inline void revision::use(){
-        ++users;
-    }
-
-    inline void revision::release(){
-        --users;
-    }
-
-    inline void revision::complete(){
-        generator = NULL;
-    }
-
-    inline void revision::invalidate(){
-        data = NULL;
-    }
-
-    inline bool revision::locked() const {
-        return (users != 0);
-    }
-
-    inline bool revision::locked_once() const {
-        return (users == 1);
-    }
-
-    inline bool revision::valid() const {
-        return (data != NULL);
-    }
-
-    inline bool revision::referenced() const {
-        return (spec.crefs != 0);
-    }
-
-} }
+}

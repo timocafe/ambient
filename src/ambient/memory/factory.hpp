@@ -28,88 +28,92 @@
 #ifndef AMBIENT_MEMORY_FACTORY
 #define AMBIENT_MEMORY_FACTORY
 
-namespace ambient { namespace memory {
+namespace ambient {
+    namespace memory {
 
-    template<size_t S>
-    class private_factory {
-    public:
-        private_factory(){
-            this->buffers.push_back(std::malloc(S));
-            this->buffer = &this->buffers[0];
-        }
-       ~private_factory(){
-            for(int i = 0; i < buffers.size(); i++) 
-                std::free(this->buffers[i]);
-        }
-        void* provide(){
-            void* chunk = *buffer;
-            if(chunk == buffers.back()){
-                buffers.push_back(std::malloc(S));
-                buffer = &buffers.back();
-            }else
-                buffer++;
-            return chunk;
-        }
-        void reset(){
-            buffer = &buffers[0];
-        }
-        size_t size(){
-            return (buffer - &buffers[0]);
-        }
-    private:
-        std::vector<void*> buffers;
-        void** buffer;
-    };
+        template<size_t S>
+        class private_factory {
+        public:
+            private_factory() {
+                this->buffers.push_back(std::malloc(S));
+                this->buffer = &this->buffers[0];
+            }
+            ~private_factory() {
+                for (int i = 0; i < buffers.size(); i++)
+                    std::free(this->buffers[i]);
+            }
+            void* provide() {
+                void* chunk = *buffer;
+                if (chunk == buffers.back()) {
+                    buffers.push_back(std::malloc(S));
+                    buffer = &buffers.back();
+                }
+                else
+                    buffer++;
+                return chunk;
+            }
+            void reset() {
+                buffer = &buffers[0];
+            }
+            size_t size() {
+                return (buffer - &buffers[0]);
+            }
+        private:
+            std::vector<void*> buffers;
+            void** buffer;
+        };
 
-    template<size_t S>
-    class factory {
-    public:
-        typedef ambient::mutex mutex;
-        typedef ambient::guard<mutex> guard;
-    private:
-        factory(const factory&) = delete;
-        factory& operator=(const factory&) = delete;
-        factory(){
-            this->buffers.push_back(std::malloc(S));
-            this->buffer = &this->buffers[0];
-        }
-    public:
-        static factory& instance(){
-            static factory singleton; return singleton;
-        }
-        static void* provide(){
-            factory& s = instance();
-            guard g(s.mtx);
-            void* chunk;
+        template<size_t S>
+        class factory {
+        public:
+            typedef ambient::mutex mutex;
+            typedef ambient::guard<mutex> guard;
+        private:
+            factory(const factory&) = delete;
+            factory& operator=(const factory&) = delete;
+            factory() {
+                this->buffers.push_back(std::malloc(S));
+                this->buffer = &this->buffers[0];
+            }
+        public:
+            static factory& instance() {
+                static factory singleton; return singleton;
+            }
+            static void* provide() {
+                factory& s = instance();
+                guard g(s.mtx);
+                void* chunk;
 
-            chunk = *s.buffer;
-            if(*s.buffer == s.buffers.back()){
-                s.buffers.push_back(std::malloc(S));
-                s.buffer = &s.buffers.back();
-            }else
-                s.buffer++;
+                chunk = *s.buffer;
+                if (*s.buffer == s.buffers.back()) {
+                    s.buffers.push_back(std::malloc(S));
+                    s.buffer = &s.buffers.back();
+                }
+                else
+                    s.buffer++;
 
-            return chunk;
-        }
-        static void deallocate(){
-            factory& s = instance();
-            for(int i = 1; i < s.buffers.size(); i++) std::free(s.buffers[i]);
-            s.buffers.resize(1);
-        }
-        static void reset(){
-            factory& s = instance();
-            s.buffer = &s.buffers[0];
-        }
-        static size_t size(){
-            factory& s = instance();
-            return (s.buffer - &s.buffers[0]);
-        }
-    private:
-        mutex mtx;
-        std::vector<void*> buffers;
-        void** buffer;
-    };
+                return chunk;
+            }
+            static void deallocate() {
+                factory& s = instance();
+                for (int i = 1; i < s.buffers.size(); i++) std::free(s.buffers[i]);
+                s.buffers.resize(1);
+            }
+            static void reset() {
+                factory& s = instance();
+                s.buffer = &s.buffers[0];
+            }
+            static size_t size() {
+                factory& s = instance();
+                return (s.buffer - &s.buffers[0]);
+            }
+        private:
+            mutex mtx;
+            std::vector<void*> buffers;
+            void** buffer;
+        };
 
-} }
+    }
+}
 
 #endif

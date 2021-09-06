@@ -32,12 +32,12 @@ namespace ambient {
 
     // {{{ primary actor-class
 
-    inline actor::~actor(){
-        if(!this->controller) return;
+    inline actor::~actor() {
+        if (!this->controller) return;
         ambient::select().deactivate(this);
     }
-    inline actor::actor(scope::const_iterator it){
-        if(! (this->controller = ambient::select().activate(this)) ) return;
+    inline actor::actor(scope::const_iterator it) {
+        if (!(this->controller = ambient::select().activate(this))) return;
         this->round = this->controller->get_num_procs();
         this->rank = (*it) % this->round;
         this->state = (this->rank == controller->get_rank()) ? locality::local : locality::remote;
@@ -58,9 +58,9 @@ namespace ambient {
     // }}}
     // {{{ actor's special case: everyone does the same
 
-    inline actor_common::actor_common(){
-        if(! (this->controller = ambient::select().activate(this)) ){
-            if(!ambient::select().get_actor().common()) throw std::runtime_error("Nested actor_common");
+    inline actor_common::actor_common() {
+        if (!(this->controller = ambient::select().activate(this))) {
+            if (!ambient::select().get_actor().common()) throw std::runtime_error("Nested actor_common");
             return;
         }
         this->rank = controller->get_shared_rank();
@@ -70,41 +70,42 @@ namespace ambient {
     // }}}
     // {{{ actor's special case: auto-scheduling actor
 
-    inline actor_auto::actor_auto(typename actor::controller_type* c){
+    inline actor_auto::actor_auto(typename actor::controller_type* c) {
         this->controller = c;
         this->controller->reserve();
         this->round = controller->get_num_procs();
         this->scores.resize(round, 0);
         this->set(0);
     }
-    inline void actor_auto::set(scope::const_iterator it){
+    inline void actor_auto::set(scope::const_iterator it) {
         this->set(*it);
     }
-    inline void actor_auto::set(rank_t r){
+    inline void actor_auto::set(rank_t r) {
         this->rank = r;
         this->state = (this->rank == controller->get_rank()) ? locality::local : locality::remote;
     }
-    inline void actor_auto::intend_read(model::revision* r){
-        if(r == NULL || model::common(r)) return;
+    inline void actor_auto::intend_read(model::revision* r) {
+        if (r == NULL || model::common(r)) return;
         this->scores[model::owner(r)] += r->spec.extent;
     }
-    inline void actor_auto::intend_write(model::revision* r){
-        if(r == NULL || model::common(r)) return;
+    inline void actor_auto::intend_write(model::revision* r) {
+        if (r == NULL || model::common(r)) return;
         this->stakeholders.push_back(model::owner(r));
     }
-    inline void actor_auto::schedule(){
+    inline void actor_auto::schedule() {
         int max = 0;
         rank_t rank = this->rank;
-        if(stakeholders.empty()){
-            for(int i = 0; i < this->round; i++)
-            if(scores[i] >= max){
-                max = scores[i];
-                rank = i;
-            }
-        }else{
-            for(int i = 0; i < stakeholders.size(); i++){
+        if (stakeholders.empty()) {
+            for (int i = 0; i < this->round; i++)
+                if (scores[i] >= max) {
+                    max = scores[i];
+                    rank = i;
+                }
+        }
+        else {
+            for (int i = 0; i < stakeholders.size(); i++) {
                 rank_t k = stakeholders[i];
-                if(scores[k] >= max){
+                if (scores[k] >= max) {
                     max = scores[k];
                     rank = k;
                 }

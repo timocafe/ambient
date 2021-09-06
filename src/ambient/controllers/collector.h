@@ -28,32 +28,34 @@
 #ifndef AMBIENT_CONTROLLERS_COLLECTOR
 #define AMBIENT_CONTROLLERS_COLLECTOR
 
-namespace ambient{ namespace memory {
+namespace ambient {
+    namespace memory {
 
-    using model::history;
-    using model::revision;
-    using model::transformable;
+        using model::history;
+        using model::revision;
+        using model::transformable;
 
-    class collector {
-    public:
-        struct delete_ptr {
-            void operator()( history* element ) const;
-            void operator()( revision* element ) const;
-            void operator()( transformable* element ) const;
+        class collector {
+        public:
+            struct delete_ptr {
+                void operator()(history* element) const;
+                void operator()(revision* element) const;
+                void operator()(transformable* element) const;
+            };
+
+            void reserve(size_t n);
+            void push_back(history* o);
+            void push_back(revision* o);
+            void push_back(transformable* o);
+            void clear();
+        private:
+            size_t reserve_limit;
+            std::vector< history* >       str;
+            std::vector< revision* >      rev;
+            std::vector< transformable* > raw;
         };
 
-        void reserve(size_t n);
-        void push_back(history* o);
-        void push_back(revision* o);
-        void push_back(transformable* o);
-        void clear();
-    private:
-        size_t reserve_limit;
-        std::vector< history* >       str;
-        std::vector< revision* >      rev;
-        std::vector< transformable* > raw;
-    };
-
-} }
+    }
+}
 
 #endif

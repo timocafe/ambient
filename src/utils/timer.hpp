@@ -35,14 +35,14 @@ namespace ambient {
     void sync();
     class async_timer {
     public:
-        async_timer(std::string name): val(0.0), name(name), count(0){}
-       ~async_timer(){
+        async_timer(std::string name) : val(0.0), name(name), count(0) {}
+        ~async_timer() {
             std::cout << "R" << ambient::rank() << ": " << name << " " << val << ", count : " << count << "\n";
         }
-        void begin(){
+        void begin() {
             this->t0 = std::chrono::system_clock::now();
         }
-        void end(){
+        void end() {
             this->val += std::chrono::duration<double>(std::chrono::system_clock::now() - this->t0).count();
             count++;
         }
@@ -58,12 +58,12 @@ namespace ambient {
 
     class timer : public async_timer {
     public:
-        timer(std::string name) : async_timer(name){}
-        void begin(){
+        timer(std::string name) : async_timer(name) {}
+        void begin() {
             ambient::sync();
             async_timer::begin();
         }
-        void end(){
+        void end() {
             ambient::sync();
             async_timer::end();
         }

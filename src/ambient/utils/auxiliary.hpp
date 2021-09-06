@@ -32,88 +32,88 @@ namespace ambient {
 
     using model::revision;
 
-    inline void sync(){
+    inline void sync() {
         ambient::select().sync();
     }
 
-    template<typename T> 
-    void sync(const T& t){ 
-        ambient::sync(); 
+    template<typename T>
+    void sync(const T& t) {
+        ambient::sync();
     }
 
-    inline bool isset(const char* env){
-        return (std::getenv( env ) != NULL);
+    inline bool isset(const char* env) {
+        return (std::getenv(env) != NULL);
     }
 
-    inline int getint(const char* env){
-        return std::atoi(std::getenv( env ));
+    inline int getint(const char* env) {
+        return std::atoi(std::getenv(env));
     }
 
-    inline int num_procs(){
+    inline int num_procs() {
         return ambient::select().get_num_procs();
     }
 
-    inline int get_tag_ub(){
+    inline int get_tag_ub() {
         return ambient::select().get_controller().get_tag_ub();
     }
 
-    inline rank_t rank(){
+    inline rank_t rank() {
         return ambient::select().get_controller().get_rank();
     }
 
-    inline bool master(){
+    inline bool master() {
         return (rank() == 0);
     }
 
-    inline bool verbose(){ 
+    inline bool verbose() {
         return ambient::select().get_controller().verbose();
     }
 
     template<typename T>
-    inline void destroy(T* o){ 
-        ambient::select().get_controller().collect(o); 
+    inline void destroy(T* o) {
+        ambient::select().get_controller().collect(o);
     }
 
     template<typename V>
-    inline bool weak(const V& obj){
+    inline bool weak(const V& obj) {
         return obj.ambient_allocator.desc->weak();
     }
 
     template<typename V>
-    inline dim2 get_dim(const V& obj){
+    inline dim2 get_dim(const V& obj) {
         return obj.ambient_allocator.desc->dim;
     }
 
-    template<typename V> 
-    inline size_t get_square_dim(V& obj){ 
+    template<typename V>
+    inline size_t get_square_dim(V& obj) {
         return get_dim(obj).square();
     }
 
     template<typename V>
-    inline size_t get_length(V& obj){
+    inline size_t get_length(V& obj) {
         return get_dim(obj).y;
     }
-    
-    template<typename V> 
-    inline size_t extent(V& obj){ 
+
+    template<typename V>
+    inline size_t extent(V& obj) {
         return obj.ambient_allocator.desc->extent;
     }
 
     template<typename V>
-    inline rank_t get_owner(const V& o){
+    inline rank_t get_owner(const V& o) {
         return o.ambient_allocator.desc->current->owner;
     }
 
     template<typename V>
-    inline bool locked_once(const V& o){
+    inline bool locked_once(const V& o) {
         return o.ambient_allocator.before->locked_once();
     }
 
-    inline rank_t which(){
+    inline rank_t which() {
         return ambient::select().get_actor().which();
     }
 
-    inline actor& get_actor(){
+    inline actor& get_actor() {
         return ambient::select().get_actor();
     }
 

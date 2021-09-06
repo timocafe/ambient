@@ -29,7 +29,7 @@
 #define AMBIENT_CONTROLLERS_CONTEXT
 #ifndef AMBIENT_SERIAL_COLLECTION
 
-namespace ambient { 
+namespace ambient {
 
     struct context_mt {
         typedef controllers::controller controller_type;
@@ -40,9 +40,9 @@ namespace ambient {
             std::stack<scope*, std::vector<scope*> > scopes;
             int offset;
         };
-        
+
         struct divergence_guard {
-           ~divergence_guard();
+            ~divergence_guard();
             divergence_guard(size_t length);
             std::vector< std::vector<controllers::meta*> > transfers;
         };
@@ -67,7 +67,7 @@ namespace ambient {
 
 #else
 
-namespace ambient { 
+namespace ambient {
 
     struct context_serial {
         typedef controllers::controller controller_type;

@@ -25,53 +25,55 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    // {{{ transformable
+        // {{{ transformable
 
-    inline void get<transformable>::spawn(transformable& t){
-        ambient::select().get_controller().queue(new get(t));
-    }
-    inline get<transformable>::get(transformable& t){
-        handle = ambient::select().get_controller().get_channel().bcast(t, ambient::which());
-    }
-    inline bool get<transformable>::ready(){
-        return handle->test();
-    }
-    inline void get<transformable>::invoke(){}
-
-    // }}}
-    // {{{ revision
-
-    inline void get<revision>::spawn(revision& r){
-        if(ambient::select().threaded()){ meta::spawn(r, meta::type::get); return; }
-        get*& transfer = (get*&)r.assist.second;
-        if(ambient::select().get_controller().update(r)) transfer = new get(r);
-        *transfer += ambient::which();
-        ambient::select().generate_sid();
-    }
-    inline get<revision>::get(revision& r) : t(r) {
-        handle = ambient::select().get_controller().get_channel().get(t);
-        t.invalidate();
-    }
-    inline void get<revision>::operator += (rank_t rank){
-        handle->append(rank);
-        if(handle->involved() && !t.valid()){
-            t.use();
-            t.generator = this;
-            t.embed(ambient::memory::malloc<memory::cpu::comm_bulk>(t.spec)); 
-            ambient::select().get_controller().queue(this);
+        inline void get<transformable>::spawn(transformable& t) {
+            ambient::select().get_controller().queue(new get(t));
         }
-    }
-    inline bool get<revision>::ready(){
-        return handle->test();
-    }
-    inline void get<revision>::invoke(){
-        ambient::select().get_controller().squeeze(&t);
-        t.release();
-        t.complete();
-    }
+        inline get<transformable>::get(transformable& t) {
+            handle = ambient::select().get_controller().get_channel().bcast(t, ambient::which());
+        }
+        inline bool get<transformable>::ready() {
+            return handle->test();
+        }
+        inline void get<transformable>::invoke() {}
 
-    // }}}
+        // }}}
+        // {{{ revision
 
-} }
+        inline void get<revision>::spawn(revision& r) {
+            if (ambient::select().threaded()) { meta::spawn(r, meta::type::get); return; }
+            get*& transfer = (get*&)r.assist.second;
+            if (ambient::select().get_controller().update(r)) transfer = new get(r);
+            *transfer += ambient::which();
+            ambient::select().generate_sid();
+        }
+        inline get<revision>::get(revision& r) : t(r) {
+            handle = ambient::select().get_controller().get_channel().get(t);
+            t.invalidate();
+        }
+        inline void get<revision>::operator += (rank_t rank) {
+            handle->append(rank);
+            if (handle->involved() && !t.valid()) {
+                t.use();
+                t.generator = this;
+                t.embed(ambient::memory::malloc<memory::cpu::comm_bulk>(t.spec));
+                ambient::select().get_controller().queue(this);
+            }
+        }
+        inline bool get<revision>::ready() {
+            return handle->test();
+        }
+        inline void get<revision>::invoke() {
+            ambient::select().get_controller().squeeze(&t);
+            t.release();
+            t.complete();
+        }
+
+        // }}}
+
+    }
+}

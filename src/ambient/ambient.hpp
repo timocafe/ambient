@@ -45,7 +45,7 @@
 #endif
 #define MPI_DISABLE -1
 
-// {{{ system includes
+ // {{{ system includes
 #if AMBIENT_MPI != MPI_DISABLE
 #include <mpi.h>
 #endif

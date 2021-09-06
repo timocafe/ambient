@@ -28,36 +28,38 @@
 #ifndef AMBIENT_MODEL_REVISION
 #define AMBIENT_MODEL_REVISION
 
-namespace ambient { namespace model {
+namespace ambient {
+    namespace model {
 
-    class revision : public memory::cpu::use_fixed_new<revision> {
-    public:
-        template<typename T> operator T* (){ return (T*)data; }
-        operator revision* (){ return NULL; }
-        revision(size_t extent, functor* g, locality l, rank_t owner);
+        class revision : public memory::cpu::use_fixed_new<revision> {
+        public:
+            template<typename T> operator T* () { return (T*)data; }
+            operator revision* () { return NULL; }
+            revision(size_t extent, functor* g, locality l, rank_t owner);
 
-        void embed(void* ptr);
-        void reuse(revision& r);
+            void embed(void* ptr);
+            void reuse(revision& r);
 
-        void use();
-        void release();
-        void complete();
-        void invalidate();
+            void use();
+            void release();
+            void complete();
+            void invalidate();
 
-        bool locked() const;
-        bool locked_once() const;
-        bool valid() const;
-        bool referenced() const;
+            bool locked() const;
+            bool locked_once() const;
+            bool valid() const;
+            bool referenced() const;
 
-        std::atomic<functor*> generator;
-        void* data;
-        rank_t owner;
-        std::atomic<int> users;
-        locality state;
-        std::pair<size_t, functor*> assist;
-        ambient::memory::descriptor spec;
-    };
+            std::atomic<functor*> generator;
+            void* data;
+            rank_t owner;
+            std::atomic<int> users;
+            locality state;
+            std::pair<size_t, functor*> assist;
+            ambient::memory::descriptor spec;
+        };
 
-} }
+    }
+}
 
 #endif

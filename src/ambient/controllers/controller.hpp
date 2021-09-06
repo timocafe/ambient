@@ -28,154 +28,157 @@
 #include "utils/rss.hpp"
 #define STACK_RESERVE 65536
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    inline controller::~controller(){ 
-        if(!chains->empty()) printf("Ambient:: exiting with operations still in queue!\n");
-        this->clear();
-    }
-
-    inline controller::controller() : chains(&stack_m), mirror(&stack_s), clock(1) {}
-
-    inline void controller::reserve(){
-        this->stack_m.reserve(STACK_RESERVE);
-        this->stack_s.reserve(STACK_RESERVE);
-        this->garbage.reserve(STACK_RESERVE);
-    }
-
-    inline void controller::flush(){
-        AMBIENT_SMP_ENABLE
-        while(!chains->empty()){
-            for(auto task : *chains){
-                if(task->ready()){
-                    AMBIENT_THREAD task->invoke();
-                    for(auto d : task->deps) d->ready();
-                    mirror->insert(mirror->end(), task->deps.begin(), task->deps.end());
-                }else mirror->push_back(task);
-            }
-            chains->clear();
-            std::swap(chains,mirror);
+        inline controller::~controller() {
+            if (!chains->empty()) printf("Ambient:: exiting with operations still in queue!\n");
+            this->clear();
         }
-        AMBIENT_SMP_DISABLE
-        clock++;
-        fence();
-    }
 
-    inline bool controller::empty(){
-        return this->chains->empty();
-    }
+        inline controller::controller() : chains(&stack_m), mirror(&stack_s), clock(1) {}
 
-    inline void controller::clear(){
-        this->garbage.clear();
-        this->memory.reset();
-    }
+        inline void controller::reserve() {
+            this->stack_m.reserve(STACK_RESERVE);
+            this->stack_s.reserve(STACK_RESERVE);
+            this->garbage.reserve(STACK_RESERVE);
+        }
 
-    inline bool controller::queue(functor* f){
-        this->chains->push_back(f);
-        return true;
-    }
+        inline void controller::flush() {
+            AMBIENT_SMP_ENABLE
+                while (!chains->empty()) {
+                    for (auto task : *chains) {
+                        if (task->ready()) {
+                            AMBIENT_THREAD task->invoke();
+                            for (auto d : task->deps) d->ready();
+                            mirror->insert(mirror->end(), task->deps.begin(), task->deps.end());
+                        }
+                        else mirror->push_back(task);
+                    }
+                    chains->clear();
+                    std::swap(chains, mirror);
+                }
+            AMBIENT_SMP_DISABLE
+                clock++;
+            fence();
+        }
 
-    inline bool controller::update(revision& r){
-        if(r.assist.first != clock){
-            r.assist.first = clock;
+        inline bool controller::empty() {
+            return this->chains->empty();
+        }
+
+        inline void controller::clear() {
+            this->garbage.clear();
+            this->memory.reset();
+        }
+
+        inline bool controller::queue(functor* f) {
+            this->chains->push_back(f);
             return true;
         }
-        return false;
-    }
 
-    inline void controller::sync(revision* r){
-        if(is_serial()) return;
-        if(model::common(r)) return;
-        if(model::local(r)) set<revision>::spawn(*r);
-        else get<revision>::spawn(*r);
-    }
+        inline bool controller::update(revision& r) {
+            if (r.assist.first != clock) {
+                r.assist.first = clock;
+                return true;
+            }
+            return false;
+        }
 
-    inline void controller::lsync(revision* r){
-        if(model::common(r)) return;
-        if(!model::local(r)) get<revision>::spawn(*r);
-    }
+        inline void controller::sync(revision* r) {
+            if (is_serial()) return;
+            if (model::common(r)) return;
+            if (model::local(r)) set<revision>::spawn(*r);
+            else get<revision>::spawn(*r);
+        }
 
-    inline void controller::rsync(revision* r){
-        if(model::common(r)) return;
-        if(model::local(r)) set<revision>::spawn(*r);
-        else get<revision>::spawn(*r); // assist
-    }
+        inline void controller::lsync(revision* r) {
+            if (model::common(r)) return;
+            if (!model::local(r)) get<revision>::spawn(*r);
+        }
 
-    inline void controller::lsync(transformable* v){
-        if(is_serial()) return;
-        set<transformable>::spawn(*v);
-    }
+        inline void controller::rsync(revision* r) {
+            if (model::common(r)) return;
+            if (model::local(r)) set<revision>::spawn(*r);
+            else get<revision>::spawn(*r); // assist
+        }
 
-    inline void controller::rsync(transformable* v){
-        get<transformable>::spawn(*v);
-    }
+        inline void controller::lsync(transformable* v) {
+            if (is_serial()) return;
+            set<transformable>::spawn(*v);
+        }
 
-    template<typename T> void controller::collect(T* o){
-        this->garbage.push_back(o);
-    }
+        inline void controller::rsync(transformable* v) {
+            get<transformable>::spawn(*v);
+        }
 
-    inline void controller::squeeze(revision* r) const {
-        if(r->valid() && !r->referenced() && r->locked_once()){
-            if(r->spec.signature == memory::cpu::standard::signature){
-                ambient::memory::free(r->data, r->spec);
-                r->spec.signature = memory::delegated::signature;
+        template<typename T> void controller::collect(T* o) {
+            this->garbage.push_back(o);
+        }
+
+        inline void controller::squeeze(revision* r) const {
+            if (r->valid() && !r->referenced() && r->locked_once()) {
+                if (r->spec.signature == memory::cpu::standard::signature) {
+                    ambient::memory::free(r->data, r->spec);
+                    r->spec.signature = memory::delegated::signature;
+                }
             }
         }
-    }
 
-    inline void controller::touch(const history* o){
-        model::touch(o);
-    }
+        inline void controller::touch(const history* o) {
+            model::touch(o);
+        }
 
-    inline void controller::use_revision(history* o){
-        model::use_revision(o);
-    }
+        inline void controller::use_revision(history* o) {
+            model::use_revision(o);
+        }
 
-    template<locality L, typename G>
-    void controller::add_revision(history* o, G g){
-        model::add_revision<L>(o, g);
-    }
+        template<locality L, typename G>
+        void controller::add_revision(history* o, G g) {
+            model::add_revision<L>(o, g);
+        }
 
-    inline int controller::get_tag_ub() const {
-        return channel.tag_ub;
-    }
+        inline int controller::get_tag_ub() const {
+            return channel.tag_ub;
+        }
 
-    inline rank_t controller::get_rank() const {
-        return channel.rank;
-    }
+        inline rank_t controller::get_rank() const {
+            return channel.rank;
+        }
 
-    inline rank_t controller::get_shared_rank() const {
-        return get_num_procs();
-    }
+        inline rank_t controller::get_shared_rank() const {
+            return get_num_procs();
+        }
 
-    inline bool controller::is_serial() const {
-        return (get_num_procs() == 1);
-    }
-        
-    inline bool controller::verbose() const {
-        return (get_rank() == 0);
-    }
+        inline bool controller::is_serial() const {
+            return (get_num_procs() == 1);
+        }
 
-    inline void controller::fence() const {
-        channel.barrier();
-    }
+        inline bool controller::verbose() const {
+            return (get_rank() == 0);
+        }
 
-    inline void controller::check_mem() const {
-        double peak_size = (double)getPeakRSS();
-        double avail_size = (double)getRSSLimit();
-        if(peak_size / avail_size < 0.9) return;
-        double current_size = (double)getCurrentRSS();
-        printf("R%d: current: %.2f%%; peak: %.2f%%\n", get_rank(), (current_size/avail_size)*100, (peak_size/avail_size)*100);
-    }
+        inline void controller::fence() const {
+            channel.barrier();
+        }
 
-    inline int controller::get_num_procs() const {
-        return channel.dim();
-    }
+        inline void controller::check_mem() const {
+            double peak_size = (double)getPeakRSS();
+            double avail_size = (double)getRSSLimit();
+            if (peak_size / avail_size < 0.9) return;
+            double current_size = (double)getCurrentRSS();
+            printf("R%d: current: %.2f%%; peak: %.2f%%\n", get_rank(), (current_size / avail_size) * 100, (peak_size / avail_size) * 100);
+        }
 
-    inline typename controller::channel_type & controller::get_channel(){
-        return channel;
-    }
+        inline int controller::get_num_procs() const {
+            return channel.dim();
+        }
 
-} }
+        inline typename controller::channel_type& controller::get_channel() {
+            return channel;
+        }
+
+    }
+}
 
 #undef STACK_RESERVE

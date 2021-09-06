@@ -25,48 +25,50 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    // {{{ transformable
+        // {{{ transformable
 
-    inline void set<transformable>::spawn(transformable& t){
-        t.generator->queue(new set(t));
-    }
-    inline set<transformable>::set(transformable& t) : t(t) {
-        handle = ambient::select().get_controller().get_channel().bcast(t, ambient::which());
-    }
-    inline bool set<transformable>::ready(){
-        return (t.generator != NULL ? false : handle->test());
-    }
-    inline void set<transformable>::invoke(){}
+        inline void set<transformable>::spawn(transformable& t) {
+            t.generator->queue(new set(t));
+        }
+        inline set<transformable>::set(transformable& t) : t(t) {
+            handle = ambient::select().get_controller().get_channel().bcast(t, ambient::which());
+        }
+        inline bool set<transformable>::ready() {
+            return (t.generator != NULL ? false : handle->test());
+        }
+        inline void set<transformable>::invoke() {}
 
-    // }}}
-    // {{{ revision
+        // }}}
+        // {{{ revision
 
-    inline void set<revision>::spawn(revision& r){
-        if(ambient::select().threaded()){ meta::spawn(r, meta::type::set); return; }
-        set*& transfer = (set*&)r.assist.second;
-        if(ambient::select().get_controller().update(r)) transfer = new set(r);
-        *transfer += ambient::which();
-        ambient::select().generate_sid();
-    }
-    inline set<revision>::set(revision& r) : t(r) {
-        t.use();
-        handle = ambient::select().get_controller().get_channel().set(t);
-        if(t.generator != NULL) (t.generator.load())->queue(this);
-        else ambient::select().get_controller().queue(this);
-    }
-    inline void set<revision>::operator += (rank_t rank){
-        handle->append(rank);
-    }
-    inline bool set<revision>::ready(){
-        return (t.generator != NULL ? false : handle->test());
-    }
-    inline void set<revision>::invoke(){
-        ambient::select().get_controller().squeeze(&t);
-        t.release(); 
-    }
+        inline void set<revision>::spawn(revision& r) {
+            if (ambient::select().threaded()) { meta::spawn(r, meta::type::set); return; }
+            set*& transfer = (set*&)r.assist.second;
+            if (ambient::select().get_controller().update(r)) transfer = new set(r);
+            *transfer += ambient::which();
+            ambient::select().generate_sid();
+        }
+        inline set<revision>::set(revision& r) : t(r) {
+            t.use();
+            handle = ambient::select().get_controller().get_channel().set(t);
+            if (t.generator != NULL) (t.generator.load())->queue(this);
+            else ambient::select().get_controller().queue(this);
+        }
+        inline void set<revision>::operator += (rank_t rank) {
+            handle->append(rank);
+        }
+        inline bool set<revision>::ready() {
+            return (t.generator != NULL ? false : handle->test());
+        }
+        inline void set<revision>::invoke() {
+            ambient::select().get_controller().squeeze(&t);
+            t.release();
+        }
 
-    // }}}
+        // }}}
 
-} }
+    }
+}

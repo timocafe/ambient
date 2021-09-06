@@ -31,21 +31,21 @@
 #include "utils/static_bind.hpp"
 
 namespace ambient {
-     
+
     template<typename T, class Allocator = default_allocator> class block;
-    namespace detail { 
+    namespace detail {
         template<typename T>
-        void fill_value(volatile block<T>& a, T& value){
+        void fill_value(volatile block<T>& a, T& value) {
             block<T>& a_ = const_cast<block<T>&>(a);
             size_t size = get_square_dim(a_);
             T* ad = a_.data();
-            for(size_t i = 0; i < size; ++i) ad[i] = value;
+            for (size_t i = 0; i < size; ++i) ad[i] = value;
         }
     }
 
     AMBIENT_STATIC_ASYNC_TEMPLATE(detail::fill_value, fill_value)
 
-    template <class T, class Allocator>
+        template <class T, class Allocator>
     class block {
     public:
         typedef Allocator allocator_type;
@@ -54,14 +54,14 @@ namespace ambient {
         size_t lda() const {
             return ambient::get_dim(*this).y;
         }
-        void init(T value){
+        void init(T value) {
             fill_value<T>(*this, value);
         }
-        value_type& operator()(size_t i, size_t j){
-            return ambient::delegated(*this).data[ j*this->lda() + i ];
+        value_type& operator()(size_t i, size_t j) {
+            return ambient::delegated(*this).data[j * this->lda() + i];
         }
         const value_type& operator()(size_t i, size_t j) const {
-            return ambient::delegated(*this).data[ j*this->lda() + i ];
+            return ambient::delegated(*this).data[j * this->lda() + i];
         }
         value_type* data() volatile {
             return ambient::delegated(*this).data;
@@ -69,9 +69,10 @@ namespace ambient {
         const value_type* data() const volatile {
             return ambient::delegated(*this).data;
         }
-    AMBIENT_DELEGATE(
-        value_type data[ AMBIENT_VAR_LENGTH ]; 
-    )};
+        AMBIENT_DELEGATE(
+            value_type data[AMBIENT_VAR_LENGTH];
+        )
+    };
 
 }
 

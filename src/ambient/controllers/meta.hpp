@@ -25,21 +25,23 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    inline void meta::spawn(revision& r, type t){
-        meta* m = new meta(r, ambient::which(), t);
-        if(t == type::get) r.generator = m;
-        ambient::select().delay_transfer(m);
-    }
-    inline meta::meta(revision& r, rank_t w, type t)
-    : r(r), which(w), t(t)
-    {
-    }
-    inline bool meta::ready(){
-        return false;
-    }
-    inline void meta::invoke(){
-    }
+        inline void meta::spawn(revision& r, type t) {
+            meta* m = new meta(r, ambient::which(), t);
+            if (t == type::get) r.generator = m;
+            ambient::select().delay_transfer(m);
+        }
+        inline meta::meta(revision& r, rank_t w, type t)
+            : r(r), which(w), t(t)
+        {
+        }
+        inline bool meta::ready() {
+            return false;
+        }
+        inline void meta::invoke() {
+        }
 
-} }
+    }
+}

@@ -28,64 +28,66 @@
 #ifndef AMBIENT_CONTROLLERS_CONTROLLER
 #define AMBIENT_CONTROLLERS_CONTROLLER
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    using model::history;
-    using model::revision;
-    using model::transformable;
-    using model::functor;
+        using model::history;
+        using model::revision;
+        using model::transformable;
+        using model::functor;
 
-    class controller {
-    public:
-        typedef channels::AMBIENT_CHANNEL_NAME::channel channel_type;
-        typedef ambient::memory::private_region<AMBIENT_INSTR_BULK_CHUNK, 
-                                               ambient::memory::private_factory<AMBIENT_INSTR_BULK_CHUNK> 
-                                               > memory_type;
-        controller();
-       ~controller();
-        void reserve();
-        bool empty();
-        void flush();
-        void clear();
-        bool queue (functor* f);
-        bool update(revision& r);
-        void sync  (revision* r);
-        void lsync (revision* r);
-        void rsync (revision* r);
-        void lsync (transformable* v);
-        void rsync (transformable* v);
-        template<typename T> void collect(T* o);
-        void squeeze(revision* r) const;
+        class controller {
+        public:
+            typedef channels::AMBIENT_CHANNEL_NAME::channel channel_type;
+            typedef ambient::memory::private_region<AMBIENT_INSTR_BULK_CHUNK,
+                ambient::memory::private_factory<AMBIENT_INSTR_BULK_CHUNK>
+            > memory_type;
+            controller();
+            ~controller();
+            void reserve();
+            bool empty();
+            void flush();
+            void clear();
+            bool queue(functor* f);
+            bool update(revision& r);
+            void sync(revision* r);
+            void lsync(revision* r);
+            void rsync(revision* r);
+            void lsync(transformable* v);
+            void rsync(transformable* v);
+            template<typename T> void collect(T* o);
+            void squeeze(revision* r) const;
 
-        void touch(const history* o);
-        void use_revision(history* o);
-        template<locality L, typename G>
-        void add_revision(history* o, G g);
+            void touch(const history* o);
+            void use_revision(history* o);
+            template<locality L, typename G>
+            void add_revision(history* o, G g);
 
-        void fence() const;
-        int get_tag_ub() const;
-        rank_t get_rank() const;
-        rank_t get_shared_rank() const;
-        int get_num_procs() const;
-        channel_type & get_channel();
+            void fence() const;
+            int get_tag_ub() const;
+            rank_t get_rank() const;
+            rank_t get_shared_rank() const;
+            int get_num_procs() const;
+            channel_type& get_channel();
 
-        void check_mem() const;
-        bool verbose() const;
-        bool is_serial() const;
+            void check_mem() const;
+            bool verbose() const;
+            bool is_serial() const;
 
-        memory_type memory;
-    private:
-        size_t clock;
-        channel_type channel;
-        std::vector< functor* > stack_m;
-        std::vector< functor* > stack_s;
-    public:
-        std::vector< functor* >* chains;
-    private:
-        std::vector< functor* >* mirror;
-        ambient::memory::collector garbage;
-    };
-    
-} }
+            memory_type memory;
+        private:
+            size_t clock;
+            channel_type channel;
+            std::vector< functor* > stack_m;
+            std::vector< functor* > stack_s;
+        public:
+            std::vector< functor* >* chains;
+        private:
+            std::vector< functor* >* mirror;
+            ambient::memory::collector garbage;
+        };
+
+    }
+}
 
 #endif

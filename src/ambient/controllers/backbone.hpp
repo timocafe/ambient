@@ -28,86 +28,86 @@
 #ifndef AMBIENT_CONTROLLERS_BACKBONE_HPP
 #define AMBIENT_CONTROLLERS_BACKBONE_HPP
 
-namespace ambient { 
+namespace ambient {
 
-        inline backbone::~backbone(){
-            delete this->base_actor;
-        }
-        inline backbone::backbone() : sid(1) {
-            this->base_actor = new actor_auto(&context::get().controller);
-            context::init(base_actor);
-            this->tag_ub = get_controller().get_tag_ub();
-            this->num_procs = get_controller().get_num_procs();
-            this->push_scope(new ambient::scope(num_procs));
-            if(!get_controller().verbose()) this->io_guard.enable();
-            if(ambient::isset("AMBIENT_VERBOSE")) this->info();
-        }
-        inline void backbone::info(){
-            if(ambient::isset("AMBIENT_DATA_BULK_LIMIT")) std::cout << "ambient: max share of data bulk: " << ambient::getint("AMBIENT_DATA_BULK_LIMIT") << "%\n";
-            if(ambient::isset("AMBIENT_COMM_BULK_LIMIT")) std::cout << "ambient: max share of comm bulk: " << ambient::getint("AMBIENT_COMM_BULK_LIMIT") << "%\n";
-            #ifdef MPI_VERSION
-            std::cout << "ambient: number of procs: " << num_procs << "\n";
-            #endif
-            std::cout << "ambient: number of threads: " << ambient::num_threads() << " (" << AMBIENT_THREADING_TAGLINE << ")\n\n";
-        }
-        inline int backbone::generate_sid(){
-            return (++sid %= tag_ub);
-        }
-        inline int backbone::get_sid(){
-            return sid;
-        }
-        inline int backbone::get_num_procs(){
-            return num_procs;
-        }
-        inline typename backbone::controller_type& backbone::get_controller(){
-            return *get_actor().controller; // caution: != context::get().controller
-        }
-        inline bool backbone::has_nested_actor(){
-            return (&get_actor() != this->base_actor);
-        }
-        inline void backbone::deactivate(actor* a){
-            context::get().actors.pop();
-        }
-        inline typename backbone::controller_type* backbone::activate(actor* a){
-            if(has_nested_actor()) return NULL;
-            context::get().actors.push(a);
-            return &context::get().controller;
-        }
-        inline void backbone::sync(){
-            context::sync();
-            memory::cpu::data_bulk::drop();
-            memory::cpu::comm_bulk::drop();
-        }
-        inline actor& backbone::get_actor(){
-            return *context::get().actors.top();
-        }
-        inline actor_auto& backbone::get_base_actor(){
-            return *this->base_actor;
-        }
-        inline scope& backbone::get_scope(){
-            return *context::get().scopes.top();
-        }
-        inline void backbone::pop_scope(){
-            context::get().scopes.pop();
-        }
-        inline void backbone::push_scope(scope* s){
-            context::get().scopes.push(s);
-        }
-        inline bool backbone::tunable(){
-            return (!get_controller().is_serial() && !has_nested_actor());
-        }
-        inline void backbone::intend_read(model::revision* r){
-            base_actor->intend_read(r); 
-        }
-        inline void backbone::intend_write(model::revision* r){
-            base_actor->intend_write(r); 
-        }
-        inline void backbone::schedule(){
-            base_actor->schedule();
-        }
-        inline ambient::mutex& backbone::get_mutex(){
-            return mtx;
-        }
+    inline backbone::~backbone() {
+        delete this->base_actor;
+    }
+    inline backbone::backbone() : sid(1) {
+        this->base_actor = new actor_auto(&context::get().controller);
+        context::init(base_actor);
+        this->tag_ub = get_controller().get_tag_ub();
+        this->num_procs = get_controller().get_num_procs();
+        this->push_scope(new ambient::scope(num_procs));
+        if (!get_controller().verbose()) this->io_guard.enable();
+        if (ambient::isset("AMBIENT_VERBOSE")) this->info();
+    }
+    inline void backbone::info() {
+        if (ambient::isset("AMBIENT_DATA_BULK_LIMIT")) std::cout << "ambient: max share of data bulk: " << ambient::getint("AMBIENT_DATA_BULK_LIMIT") << "%\n";
+        if (ambient::isset("AMBIENT_COMM_BULK_LIMIT")) std::cout << "ambient: max share of comm bulk: " << ambient::getint("AMBIENT_COMM_BULK_LIMIT") << "%\n";
+#ifdef MPI_VERSION
+        std::cout << "ambient: number of procs: " << num_procs << "\n";
+#endif
+        std::cout << "ambient: number of threads: " << ambient::num_threads() << " (" << AMBIENT_THREADING_TAGLINE << ")\n\n";
+    }
+    inline int backbone::generate_sid() {
+        return (++sid %= tag_ub);
+    }
+    inline int backbone::get_sid() {
+        return sid;
+    }
+    inline int backbone::get_num_procs() {
+        return num_procs;
+    }
+    inline typename backbone::controller_type& backbone::get_controller() {
+        return *get_actor().controller; // caution: != context::get().controller
+    }
+    inline bool backbone::has_nested_actor() {
+        return (&get_actor() != this->base_actor);
+    }
+    inline void backbone::deactivate(actor* a) {
+        context::get().actors.pop();
+    }
+    inline typename backbone::controller_type* backbone::activate(actor* a) {
+        if (has_nested_actor()) return NULL;
+        context::get().actors.push(a);
+        return &context::get().controller;
+    }
+    inline void backbone::sync() {
+        context::sync();
+        memory::cpu::data_bulk::drop();
+        memory::cpu::comm_bulk::drop();
+    }
+    inline actor& backbone::get_actor() {
+        return *context::get().actors.top();
+    }
+    inline actor_auto& backbone::get_base_actor() {
+        return *this->base_actor;
+    }
+    inline scope& backbone::get_scope() {
+        return *context::get().scopes.top();
+    }
+    inline void backbone::pop_scope() {
+        context::get().scopes.pop();
+    }
+    inline void backbone::push_scope(scope* s) {
+        context::get().scopes.push(s);
+    }
+    inline bool backbone::tunable() {
+        return (!get_controller().is_serial() && !has_nested_actor());
+    }
+    inline void backbone::intend_read(model::revision* r) {
+        base_actor->intend_read(r);
+    }
+    inline void backbone::intend_write(model::revision* r) {
+        base_actor->intend_write(r);
+    }
+    inline void backbone::schedule() {
+        base_actor->schedule();
+    }
+    inline ambient::mutex& backbone::get_mutex() {
+        return mtx;
+    }
 }
 
 #endif

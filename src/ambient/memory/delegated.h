@@ -28,13 +28,15 @@
 #ifndef AMBIENT_MEMORY_DELEGATED_H
 #define AMBIENT_MEMORY_DELEGATED_H
 
-namespace ambient { namespace memory {
+namespace ambient {
+    namespace memory {
 
-    class delegated {
-    public:
-        static constexpr int signature = serial_id<delegated>();
-    };
+        class delegated {
+        public:
+            static constexpr int signature = serial_id<delegated>();
+        };
 
-} }
+    }
+}
 
 #endif

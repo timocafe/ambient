@@ -28,22 +28,24 @@
 #ifndef AMBIENT_MODEL_HISTORY
 #define AMBIENT_MODEL_HISTORY
 
-// revision tracking mechanism (target selector)
-namespace ambient { namespace model {
+ // revision tracking mechanism (target selector)
+namespace ambient {
+    namespace model {
 
-    class history : public memory::cpu::use_fixed_new<history> {
-    public:
-        history(dim2,size_t);
-        void init_state();
-        template<locality L> void add_state(functor* g);
-        template<locality L> void add_state(rank_t g);
-        revision* back() const;
-        bool weak() const;
-        revision* current;
-        size_t extent;
-        dim2 dim;
-    };
+        class history : public memory::cpu::use_fixed_new<history> {
+        public:
+            history(dim2, size_t);
+            void init_state();
+            template<locality L> void add_state(functor* g);
+            template<locality L> void add_state(rank_t g);
+            revision* back() const;
+            bool weak() const;
+            revision* current;
+            size_t extent;
+            dim2 dim;
+        };
 
-} }
+    }
+}
 
 #endif

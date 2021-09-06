@@ -28,17 +28,21 @@
 #ifndef AMBIENT_MEMORY_CPU_BULK_H
 #define AMBIENT_MEMORY_CPU_BULK_H
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    class bulk {
-        bulk(const bulk&) = delete;
-        bulk& operator=(const bulk&) = delete;
-    protected:
-        bulk() = default;
-    public:
-        static constexpr int signature = serial_id<cpu::bulk>();
-    };
+            class bulk {
+                bulk(const bulk&) = delete;
+                bulk& operator=(const bulk&) = delete;
+            protected:
+                bulk() = default;
+            public:
+                static constexpr int signature = serial_id<cpu::bulk>();
+            };
 
-} } }
+        }
+    }
+}
 
 #endif

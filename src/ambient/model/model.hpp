@@ -25,36 +25,38 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-namespace ambient { namespace model {
+namespace ambient {
+    namespace model {
 
-    template<locality L, typename G>
-    void add_revision(history* o, G g){
-        o->add_state<L>(g);
+        template<locality L, typename G>
+        void add_revision(history* o, G g) {
+            o->add_state<L>(g);
+        }
+
+        inline void use_revision(history* o) {
+            o->back()->use();
+        }
+
+        inline void touch(const history* o) {
+            if (o->back() == NULL)
+                const_cast<history*>(o)->init_state();
+        }
+
+        inline bool local(const revision* r) {
+            return (r->state == locality::local);
+        }
+
+        inline bool remote(const revision* r) {
+            return (r->state == locality::remote);
+        }
+
+        inline bool common(const revision* r) {
+            return (r->state == locality::common);
+        }
+
+        inline rank_t owner(const revision* r) {
+            return r->owner;
+        }
+
     }
-
-    inline void use_revision(history* o){
-        o->back()->use();
-    }
-
-    inline void touch(const history* o){
-        if(o->back() == NULL)
-            const_cast<history*>(o)->init_state();
-    }
-
-    inline bool local(const revision* r){
-        return (r->state == locality::local);
-    }
-
-    inline bool remote(const revision* r){
-        return (r->state == locality::remote);
-    }
-
-    inline bool common(const revision* r){
-        return (r->state == locality::common);
-    }
-
-    inline rank_t owner(const revision* r){
-        return r->owner;
-    }
-
-} }
+}

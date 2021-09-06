@@ -35,213 +35,217 @@
 #include <alps/hdf5/complex.hpp>
 #endif
 
-namespace ambient { inline namespace numeric {
+namespace ambient {
+    inline namespace numeric {
 
-    template <class Matrix, int IB = AMBIENT_DEFAULT_IB>
-    class tiles : public ambient::memory::cpu::use_fixed_new<tiles<Matrix,IB> > {
-    public:
-        typedef typename Matrix::value_type  value_type;
-        typedef typename Matrix::size_type   size_type;
-        typedef typename Matrix::real_type   real_type;
-        typedef typename Matrix::scalar_type scalar_type;
-        typedef typename Matrix::difference_type difference_type;
-        typedef typename Matrix::allocator_type allocator_type;
+        template <class Matrix, int IB = AMBIENT_DEFAULT_IB>
+        class tiles : public ambient::memory::cpu::use_fixed_new<tiles<Matrix, IB> > {
+        public:
+            typedef typename Matrix::value_type  value_type;
+            typedef typename Matrix::size_type   size_type;
+            typedef typename Matrix::real_type   real_type;
+            typedef typename Matrix::scalar_type scalar_type;
+            typedef typename Matrix::difference_type difference_type;
+            typedef typename Matrix::allocator_type allocator_type;
 
-        static tiles<Matrix,IB> identity_matrix(size_type size);
+            static tiles<Matrix, IB> identity_matrix(size_type size);
 
-       ~tiles();
-        explicit tiles();
-        explicit tiles(Matrix* a);
-        explicit tiles(size_type rows, size_type cols, value_type init_value = value_type());
-        tiles<subset_view<Matrix>, IB> subset(size_type i, size_type j, size_type mt, size_type nt) const;
-        tiles(const tiles& a);
-        tiles& operator = (const tiles& rhs);
-        template <class MatrixB> tiles& operator  = (const tiles<MatrixB,IB>& rhs);
-        size_type num_rows() const;
-        size_type num_cols() const;
-        size_type num_tiles() const;
-        scalar_type trace() const;
-        void transpose();
-        void conj();
-        bool empty() const;          
-        void swap(tiles& r);
-        void resize(size_type m, size_type n); 
-        Matrix& tile(size_type i, size_type j);
-        const Matrix& tile(size_type i, size_type j) const;
-        Matrix& locate(size_type i, size_type j);
-        const Matrix& locate(size_type i, size_type j) const;
-        size_t addr(size_type i, size_type j) const;
-        Matrix& operator[] (size_type k);
-        const Matrix& operator[] (size_type k) const;
-        template <class MatrixB> operator tiles<MatrixB,IB> () const;
-        template <class MatrixB> tiles& operator += (const tiles<MatrixB,IB>& rhs);
-        template <class MatrixB> tiles& operator -= (const tiles<MatrixB,IB>& rhs);
-        template <typename T2> tiles& operator *= (const T2& t);
-        template <typename T2> tiles& operator /= (const T2& t);
-        value_type& operator() (size_type i, size_type j);
-        const value_type& operator() (size_type i, size_type j) const;
-
-        #ifdef AMBIENT_ALPS_HDF5
-        friend void load(alps::hdf5::archive& ar
-                         , std::string const& path
-                         , tiles<Matrix,IB>& m
-                         , std::vector<std::size_t> chunk  = std::vector<std::size_t>()
-                         , std::vector<std::size_t> offset = std::vector<std::size_t>()
-                         )
-        {
-            std::vector<std::size_t> size(ar.extent(path));
-            tiles<Matrix,IB> r(size[chunk.size()+1], size[chunk.size()]);
-            m.swap(r);
-
-            std::vector<std::size_t> first(alps::hdf5::get_extent(value_type()));
-            
-            std::size_t const chunk_cols_index = chunk.size();
-            chunk.push_back(0); // to be filled later
-            std::size_t const chunk_row_index = chunk.size();
-            chunk.push_back(0); // to be filled later
-            copy(first.begin(),first.end(), std::back_inserter(chunk));
-            
-            std::size_t const offset_col_index = offset.size();
-            offset.push_back(0); // to be filled later
-            std::size_t const offset_row_index = offset.size();
-            offset.push_back(0); // to be filled later
-            fill_n(std::back_inserter(offset), first.size(), 0);
-            
-            for(int j = 0; j < m.nt; ++j){
-                for(int i = 0; i < m.mt; ++i){
-                    chunk[chunk_cols_index] = m.tile(i,j).num_cols();
-                    chunk[chunk_row_index] = m.tile(i,j).num_rows();
-                    offset[offset_row_index] = i*IB;
-                    offset[offset_col_index] = j*IB;
-
-                    if(!ambient::ext::exclusive(m.tile(i,j)))
-                    ar.read(path, (typename traits::real_type<value_type>::type *)ambient::ext::naked(m.tile(i,j)), chunk, offset);
-                }
-            }
-        }
-
-        friend void save(alps::hdf5::archive& ar
-                         , std::string const& path
-                         , tiles<Matrix,IB> const& m
-                         , std::vector<std::size_t> size   = std::vector<std::size_t>()
-                         , std::vector<std::size_t> chunk  = std::vector<std::size_t>()
-                         , std::vector<std::size_t> offset = std::vector<std::size_t>()
-                         )
-        {
-            size.push_back(m.cols);
-            size.push_back(m.rows);
-            std::vector<std::size_t> first(alps::hdf5::get_extent(value_type()));
-            std::copy(first.begin(), first.end(), std::back_inserter(size));
-            
-            std::size_t const chunk_cols_index = chunk.size();
-            chunk.push_back(0); // to be filled later
-            std::size_t const chunk_row_index = chunk.size();
-            chunk.push_back(0); // to be filled later
-            copy(first.begin(),first.end(), std::back_inserter(chunk));
-            
-            std::size_t const offset_col_index = offset.size();
-            offset.push_back(0); // to be filled later
-            std::size_t const offset_row_index = offset.size();
-            offset.push_back(0); // to be filled later
-            fill_n(std::back_inserter(offset), first.size(), 0);
-            
-            for(int j = 0; j < m.nt; ++j){
-                for(int i = 0; i < m.mt; ++i){
-                    chunk[chunk_cols_index] = m.tile(i,j).num_cols();
-                    chunk[chunk_row_index] = m.tile(i,j).num_rows();
-                    offset[offset_row_index] = i*IB;
-                    offset[offset_col_index] = j*IB;
-                    
-                    using alps::hdf5::detail::get_pointer;
-                    assert(ambient::ext::naked(m.tile(i,j)).state == ambient::locality::local);
-                    if(ambient::weak(m.tile(i,j))) throw std::runtime_error("Error: attempting to write uninitialised data!");
-                    ar.write(path, (typename traits::real_type<value_type>::type *)ambient::ext::naked(m.tile(i,j)), size, chunk, offset);
-                }
-            }
-        }
-        #endif
-    public:
-        std::vector<Matrix*> data;
-        size_type rows;
-        size_type cols;
-        size_type mt;
-        size_type nt;
-    };
-
-    template <class Matrix, int IB>
-    class tiles<subset_view<Matrix>, IB>{
-    public:
-        typedef typename Matrix::difference_type difference_type;
-        typedef typename Matrix::size_type  size_type;
-        typedef typename Matrix::value_type value_type;
-        typedef typename Matrix::allocator_type allocator_type;
-
-        Matrix& tile(size_type i, size_type j);
-        const Matrix& tile(size_type i, size_type j) const;
-        Matrix& operator[] (size_type k);
-        const Matrix& operator[] (size_type k) const;
-        tiles<subset_view<Matrix>,IB> subset(size_type i, size_type j, size_type mt, size_type nt) const;
-        template <class MatrixB> tiles& operator += (const tiles<MatrixB,IB>& rhs);
-        template <class MatrixB> tiles& operator -= (const tiles<MatrixB,IB>& rhs);
-        template <class MatrixB> tiles& operator  = (const tiles<MatrixB,IB>& rhs);
-        tiles& operator  = (const tiles& rhs);
-        size_type num_rows() const;
-        size_type num_cols() const;
-        size_type num_tiles() const;
-        Matrix& locate(size_type i, size_type j);
-        const Matrix& locate(size_type i, size_type j) const;
-        size_t addr(size_type i, size_type j) const;
-    public:
-        std::vector<subset_view<Matrix> > data;
-        size_type rows;
-        size_type cols;
-        size_type mt;
-        size_type nt;
-    };
-
-    template <typename T, int IB>
-    class tiles<diagonal_matrix<T>, IB> : public ambient::memory::cpu::use_fixed_new<tiles<diagonal_matrix<T>, IB> > {
-    public:
-        typedef typename diagonal_matrix<T>::value_type  value_type;
-        typedef typename diagonal_matrix<T>::size_type   size_type;
-        typedef typename diagonal_matrix<T>::real_type   real_type;
-        typedef typename diagonal_matrix<T>::scalar_type scalar_type;
-        typedef typename diagonal_matrix<T>::difference_type difference_type;
-
-        static tiles identity_matrix(size_type size);
-
-        explicit tiles();
-        explicit tiles(size_type rows, size_type cols, value_type init_value = value_type()); 
-        tiles(const tiles& a);
-        tiles& operator = (const tiles& rhs); 
-       ~tiles();
-    public:
-        std::pair<const value_type*,const value_type*> diagonal() const;
-        const value_type* begin() const;
-        const value_type* end() const; // actual only for merged case
-        size_type num_rows() const;
-        size_type num_cols() const;
-        size_type num_tiles() const;
-        void swap(tiles& r);
-        void resize(size_type m, size_type n); 
-        diagonal_matrix<T>& operator[] (size_type k);
-        const diagonal_matrix<T>& operator[] (size_type k) const;
-        value_type& operator() (size_type i, size_type j);
-        const value_type& operator() (size_type i, size_type j) const;
-    public:
-        std::vector<diagonal_matrix<T>*> data;
-        size_type size;
-        size_type nt;
-    };
-
-} }
+            ~tiles();
+            explicit tiles();
+            explicit tiles(Matrix* a);
+            explicit tiles(size_type rows, size_type cols, value_type init_value = value_type());
+            tiles<subset_view<Matrix>, IB> subset(size_type i, size_type j, size_type mt, size_type nt) const;
+            tiles(const tiles& a);
+            tiles& operator = (const tiles& rhs);
+            template <class MatrixB> tiles& operator  = (const tiles<MatrixB, IB>& rhs);
+            size_type num_rows() const;
+            size_type num_cols() const;
+            size_type num_tiles() const;
+            scalar_type trace() const;
+            void transpose();
+            void conj();
+            bool empty() const;
+            void swap(tiles& r);
+            void resize(size_type m, size_type n);
+            Matrix& tile(size_type i, size_type j);
+            const Matrix& tile(size_type i, size_type j) const;
+            Matrix& locate(size_type i, size_type j);
+            const Matrix& locate(size_type i, size_type j) const;
+            size_t addr(size_type i, size_type j) const;
+            Matrix& operator[] (size_type k);
+            const Matrix& operator[] (size_type k) const;
+            template <class MatrixB> operator tiles<MatrixB, IB>() const;
+            template <class MatrixB> tiles& operator += (const tiles<MatrixB, IB>& rhs);
+            template <class MatrixB> tiles& operator -= (const tiles<MatrixB, IB>& rhs);
+            template <typename T2> tiles& operator *= (const T2& t);
+            template <typename T2> tiles& operator /= (const T2& t);
+            value_type& operator() (size_type i, size_type j);
+            const value_type& operator() (size_type i, size_type j) const;
 
 #ifdef AMBIENT_ALPS_HDF5
-namespace alps { namespace hdf5 {
-    template<class Matrix, int IB>
-    struct has_complex_elements<ambient::tiles<Matrix,IB> >
-    : public has_complex_elements<typename alps::detail::remove_cvr<typename Matrix::value_type>::type>
-    {};
-} }
+            friend void load(alps::hdf5::archive& ar
+                , std::string const& path
+                , tiles<Matrix, IB>& m
+                , std::vector<std::size_t> chunk = std::vector<std::size_t>()
+                , std::vector<std::size_t> offset = std::vector<std::size_t>()
+            )
+            {
+                std::vector<std::size_t> size(ar.extent(path));
+                tiles<Matrix, IB> r(size[chunk.size() + 1], size[chunk.size()]);
+                m.swap(r);
+
+                std::vector<std::size_t> first(alps::hdf5::get_extent(value_type()));
+
+                std::size_t const chunk_cols_index = chunk.size();
+                chunk.push_back(0); // to be filled later
+                std::size_t const chunk_row_index = chunk.size();
+                chunk.push_back(0); // to be filled later
+                copy(first.begin(), first.end(), std::back_inserter(chunk));
+
+                std::size_t const offset_col_index = offset.size();
+                offset.push_back(0); // to be filled later
+                std::size_t const offset_row_index = offset.size();
+                offset.push_back(0); // to be filled later
+                fill_n(std::back_inserter(offset), first.size(), 0);
+
+                for (int j = 0; j < m.nt; ++j) {
+                    for (int i = 0; i < m.mt; ++i) {
+                        chunk[chunk_cols_index] = m.tile(i, j).num_cols();
+                        chunk[chunk_row_index] = m.tile(i, j).num_rows();
+                        offset[offset_row_index] = i * IB;
+                        offset[offset_col_index] = j * IB;
+
+                        if (!ambient::ext::exclusive(m.tile(i, j)))
+                            ar.read(path, (typename traits::real_type<value_type>::type*)ambient::ext::naked(m.tile(i, j)), chunk, offset);
+                    }
+                }
+            }
+
+            friend void save(alps::hdf5::archive& ar
+                , std::string const& path
+                , tiles<Matrix, IB> const& m
+                , std::vector<std::size_t> size = std::vector<std::size_t>()
+                , std::vector<std::size_t> chunk = std::vector<std::size_t>()
+                , std::vector<std::size_t> offset = std::vector<std::size_t>()
+            )
+            {
+                size.push_back(m.cols);
+                size.push_back(m.rows);
+                std::vector<std::size_t> first(alps::hdf5::get_extent(value_type()));
+                std::copy(first.begin(), first.end(), std::back_inserter(size));
+
+                std::size_t const chunk_cols_index = chunk.size();
+                chunk.push_back(0); // to be filled later
+                std::size_t const chunk_row_index = chunk.size();
+                chunk.push_back(0); // to be filled later
+                copy(first.begin(), first.end(), std::back_inserter(chunk));
+
+                std::size_t const offset_col_index = offset.size();
+                offset.push_back(0); // to be filled later
+                std::size_t const offset_row_index = offset.size();
+                offset.push_back(0); // to be filled later
+                fill_n(std::back_inserter(offset), first.size(), 0);
+
+                for (int j = 0; j < m.nt; ++j) {
+                    for (int i = 0; i < m.mt; ++i) {
+                        chunk[chunk_cols_index] = m.tile(i, j).num_cols();
+                        chunk[chunk_row_index] = m.tile(i, j).num_rows();
+                        offset[offset_row_index] = i * IB;
+                        offset[offset_col_index] = j * IB;
+
+                        using alps::hdf5::detail::get_pointer;
+                        assert(ambient::ext::naked(m.tile(i, j)).state == ambient::locality::local);
+                        if (ambient::weak(m.tile(i, j))) throw std::runtime_error("Error: attempting to write uninitialised data!");
+                        ar.write(path, (typename traits::real_type<value_type>::type*)ambient::ext::naked(m.tile(i, j)), size, chunk, offset);
+                    }
+                }
+            }
+#endif
+        public:
+            std::vector<Matrix*> data;
+            size_type rows;
+            size_type cols;
+            size_type mt;
+            size_type nt;
+        };
+
+        template <class Matrix, int IB>
+        class tiles<subset_view<Matrix>, IB> {
+        public:
+            typedef typename Matrix::difference_type difference_type;
+            typedef typename Matrix::size_type  size_type;
+            typedef typename Matrix::value_type value_type;
+            typedef typename Matrix::allocator_type allocator_type;
+
+            Matrix& tile(size_type i, size_type j);
+            const Matrix& tile(size_type i, size_type j) const;
+            Matrix& operator[] (size_type k);
+            const Matrix& operator[] (size_type k) const;
+            tiles<subset_view<Matrix>, IB> subset(size_type i, size_type j, size_type mt, size_type nt) const;
+            template <class MatrixB> tiles& operator += (const tiles<MatrixB, IB>& rhs);
+            template <class MatrixB> tiles& operator -= (const tiles<MatrixB, IB>& rhs);
+            template <class MatrixB> tiles& operator  = (const tiles<MatrixB, IB>& rhs);
+            tiles& operator  = (const tiles& rhs);
+            size_type num_rows() const;
+            size_type num_cols() const;
+            size_type num_tiles() const;
+            Matrix& locate(size_type i, size_type j);
+            const Matrix& locate(size_type i, size_type j) const;
+            size_t addr(size_type i, size_type j) const;
+        public:
+            std::vector<subset_view<Matrix> > data;
+            size_type rows;
+            size_type cols;
+            size_type mt;
+            size_type nt;
+        };
+
+        template <typename T, int IB>
+        class tiles<diagonal_matrix<T>, IB> : public ambient::memory::cpu::use_fixed_new<tiles<diagonal_matrix<T>, IB> > {
+        public:
+            typedef typename diagonal_matrix<T>::value_type  value_type;
+            typedef typename diagonal_matrix<T>::size_type   size_type;
+            typedef typename diagonal_matrix<T>::real_type   real_type;
+            typedef typename diagonal_matrix<T>::scalar_type scalar_type;
+            typedef typename diagonal_matrix<T>::difference_type difference_type;
+
+            static tiles identity_matrix(size_type size);
+
+            explicit tiles();
+            explicit tiles(size_type rows, size_type cols, value_type init_value = value_type());
+            tiles(const tiles& a);
+            tiles& operator = (const tiles& rhs);
+            ~tiles();
+        public:
+            std::pair<const value_type*, const value_type*> diagonal() const;
+            const value_type* begin() const;
+            const value_type* end() const; // actual only for merged case
+            size_type num_rows() const;
+            size_type num_cols() const;
+            size_type num_tiles() const;
+            void swap(tiles& r);
+            void resize(size_type m, size_type n);
+            diagonal_matrix<T>& operator[] (size_type k);
+            const diagonal_matrix<T>& operator[] (size_type k) const;
+            value_type& operator() (size_type i, size_type j);
+            const value_type& operator() (size_type i, size_type j) const;
+        public:
+            std::vector<diagonal_matrix<T>*> data;
+            size_type size;
+            size_type nt;
+        };
+
+    }
+}
+
+#ifdef AMBIENT_ALPS_HDF5
+namespace alps {
+    namespace hdf5 {
+        template<class Matrix, int IB>
+        struct has_complex_elements<ambient::tiles<Matrix, IB> >
+            : public has_complex_elements<typename alps::detail::remove_cvr<typename Matrix::value_type>::type>
+        {};
+    }
+}
 #endif
 #endif

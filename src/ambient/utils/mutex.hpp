@@ -28,17 +28,17 @@
 #ifndef AMBIENT_UTILS_MUTEX
 #define AMBIENT_UTILS_MUTEX
 
-namespace ambient { 
+namespace ambient {
 
     template <typename M>
     class guard {
     private:
         M& mtx;
-        guard(const guard &);
-        void operator= (const guard &);
+        guard(const guard&);
+        void operator= (const guard&);
     public:
-        explicit guard(M& nmtx) : mtx(nmtx){ mtx.lock(); }
-        ~guard(){ mtx.unlock(); }
+        explicit guard(M& nmtx) : mtx(nmtx) { mtx.lock(); }
+        ~guard() { mtx.unlock(); }
     };
 
     class mutex {
@@ -48,32 +48,36 @@ namespace ambient {
         mutex(mutex const&) = delete;
         mutex& operator= (mutex const&) = delete;
 
-        mutex(){
-            int const res = pthread_mutex_init(&m,NULL);
+        mutex() {
+            int const res = pthread_mutex_init(&m, NULL);
             assert(res == 0);
         }
-       ~mutex(){
+        ~mutex() {
             int ret;
-            do{ ret = pthread_mutex_destroy(&m);
-            } while(ret == EINTR);
+            do {
+                ret = pthread_mutex_destroy(&m);
+            } while (ret == EINTR);
         }
-        void lock(){
+        void lock() {
             int res;
-            do{ res = pthread_mutex_lock(&m);
-            }while (res == EINTR);
+            do {
+                res = pthread_mutex_lock(&m);
+            } while (res == EINTR);
             assert(res == 0);
         }
-        void unlock(){
+        void unlock() {
             int res;
-            do{ res = pthread_mutex_unlock(&m);
-            } while(res == EINTR);
+            do {
+                res = pthread_mutex_unlock(&m);
+            } while (res == EINTR);
             assert(res == 0);
         }
-        bool try_lock(){
+        bool try_lock() {
             int res;
-            do{ res = pthread_mutex_trylock(&m);
-            } while(res == EINTR);
-            if(res == EBUSY) return false;
+            do {
+                res = pthread_mutex_trylock(&m);
+            } while (res == EINTR);
+            if (res == EBUSY) return false;
             return !res;
         }
     };

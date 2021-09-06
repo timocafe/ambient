@@ -28,37 +28,39 @@
 #ifndef AMBIENT_CONTROLLERS_SET
 #define AMBIENT_CONTROLLERS_SET
 
-namespace ambient { namespace controllers {
+namespace ambient {
+    namespace controllers {
 
-    template<class T> class set {};
+        template<class T> class set {};
 
-    template<>
-    class set<transformable> : public functor, public memory::cpu::use_bulk_new<set<transformable> > {
-    public:
-        template<class T> using collective = controller::channel_type::collective_type<T>;
-        static void spawn(transformable& v);
-        set(transformable& v);
-        virtual void invoke();
-        virtual bool ready();
-    private:
-        collective<transformable>* handle;
-        transformable& t;
-    };
+        template<>
+        class set<transformable> : public functor, public memory::cpu::use_bulk_new<set<transformable> > {
+        public:
+            template<class T> using collective = controller::channel_type::collective_type<T>;
+            static void spawn(transformable& v);
+            set(transformable& v);
+            virtual void invoke();
+            virtual bool ready();
+        private:
+            collective<transformable>* handle;
+            transformable& t;
+        };
 
-    template<>
-    class set<revision> : public functor, public memory::cpu::use_bulk_new<set<revision> > {
-    public:
-        template<class T> using collective = controller::channel_type::collective_type<T>;
-        static void spawn(revision& r);
-        set(revision& r);
-        virtual void invoke();
-        virtual bool ready();
-        void operator += (rank_t rank);
-    private:
-        collective<revision>* handle;
-        revision& t;
-    };
+        template<>
+        class set<revision> : public functor, public memory::cpu::use_bulk_new<set<revision> > {
+        public:
+            template<class T> using collective = controller::channel_type::collective_type<T>;
+            static void spawn(revision& r);
+            set(revision& r);
+            virtual void invoke();
+            virtual bool ready();
+            void operator += (rank_t rank);
+        private:
+            collective<revision>* handle;
+            revision& t;
+        };
 
-} }
+    }
+}
 
 #endif

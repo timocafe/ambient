@@ -30,44 +30,44 @@
 
 namespace ambient {
 
-    inline void meminfo(){
+    inline void meminfo() {
         typedef ambient::future<double> real_type;
         std::vector<real_type> peaks; peaks.reserve(ambient::scope::size());
         std::vector<real_type> currents; currents.reserve(ambient::scope::size());
-       
-        for(int i = 0; i < ambient::scope::size(); i++){
-            ambient::actor where(ambient::scope::begin()+i);
+
+        for (int i = 0; i < ambient::scope::size(); i++) {
+            ambient::actor where(ambient::scope::begin() + i);
             real_type current, peak;
-       
-            ambient::async([](real_type& c, real_type& p){
+
+            ambient::async([](real_type& c, real_type& p) {
                 double avail_size = (double)getRSSLimit();
-                c.set( (double)getCurrentRSS()*100 / avail_size );
-                p.set( (double)getPeakRSS()*100    / avail_size );
-            }, current, peak);
-       
+                c.set((double)getCurrentRSS() * 100 / avail_size);
+                p.set((double)getPeakRSS() * 100 / avail_size);
+                }, current, peak);
+
             currents.push_back(current);
             peaks.push_back(peak);
         }
         ambient::sync();
-       
-        if(ambient::master()){
+
+        if (ambient::master()) {
             double average_c = 0, average_p = 0;
             int min_c = 0, min_p = 0;
             int max_c = 0, max_p = 0;
-            
-            for(int k = 0; k < ambient::scope::size(); k++){
+
+            for (int k = 0; k < ambient::scope::size(); k++) {
                 average_c += currents[k];
-                if(currents[min_c] > currents[k]) min_c = k;
-                else if(currents[max_c] < currents[k]) max_c = k;
-            
+                if (currents[min_c] > currents[k]) min_c = k;
+                else if (currents[max_c] < currents[k]) max_c = k;
+
                 average_p += peaks[k];
-                if(peaks[min_p] > peaks[k]) min_p = k;
-                else if(peaks[max_p] < peaks[k]) max_p = k;
+                if (peaks[min_p] > peaks[k]) min_p = k;
+                else if (peaks[max_p] < peaks[k]) max_p = k;
             }
-       
+
             average_c /= ambient::scope::size();
             average_p /= ambient::scope::size();
-       
+
             printf("Current average consumption: %.1f%%, min is %.1f%% (R%d), max is %.1f%% (R%d)\n", average_c, (double)currents[min_c], min_c, (double)currents[max_c], max_c);
             printf("Peak average consumption: %.1f%%, min is %.1f%% (R%d), max is %.1f%% (R%d)\n", average_p, (double)peaks[min_p], min_p, (double)peaks[max_p], max_p);
         }

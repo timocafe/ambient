@@ -28,28 +28,30 @@
 #ifndef AMBIENT_IO
 #define AMBIENT_IO
 
-namespace ambient { namespace utils {
+namespace ambient {
+    namespace utils {
 
-    class funneled_io {
-    public:
-        funneled_io() : nullio("/dev/null"), latch(NULL) { }
-       ~funneled_io(){
-            disable();
-        }
-        void enable(){
-            latch = std::cout.rdbuf();
-            std::cout.rdbuf(nullio.rdbuf());
-        }
-        void disable(){
-            if(!latch) return;
-            std::cout.rdbuf(latch);
-            latch = NULL;
-        }
-    private:
-        std::ofstream nullio;
-        std::streambuf* latch;
-    };
+        class funneled_io {
+        public:
+            funneled_io() : nullio("/dev/null"), latch(NULL) { }
+            ~funneled_io() {
+                disable();
+            }
+            void enable() {
+                latch = std::cout.rdbuf();
+                std::cout.rdbuf(nullio.rdbuf());
+            }
+            void disable() {
+                if (!latch) return;
+                std::cout.rdbuf(latch);
+                latch = NULL;
+            }
+        private:
+            std::ofstream nullio;
+            std::streambuf* latch;
+        };
 
-} }
+    }
+}
 
 #endif

@@ -1,6 +1,6 @@
 #include "utils/testing.hpp"
 
-TEST_CASE( "Matrix multiplication performance measured", "[ambient::gemm]" )
+TEST_CASE("Matrix multiplication performance measured", "[ambient::gemm]")
 {
     measurement::timer gtime("total"); gtime.begin();
     measurement params;
@@ -18,13 +18,13 @@ TEST_CASE( "Matrix multiplication performance measured", "[ambient::gemm]" )
     ambient::sync();
 
     printf("ambient::gemm strassen...\n");
-    ambient::numeric::gemm_strassen(std::move(A), std::move(B), std::move(C)); 
+    ambient::numeric::gemm_strassen(std::move(A), std::move(B), std::move(C));
     measurement::timer time("ambient::gemm_strassen"); time.begin();
     ambient::sync();
     time.end();
 
     printf("ambient::gemm...\n");
-    ambient::numeric::gemm(A, B, C_orig); 
+    ambient::numeric::gemm(A, B, C_orig);
     measurement::timer time_orig("ambient::gemm"); time_orig.begin();
     ambient::sync();
     time_orig.end();

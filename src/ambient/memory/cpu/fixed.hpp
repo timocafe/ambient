@@ -28,15 +28,19 @@
 #ifndef AMBIENT_MEMORY_CPU_FIXED_HPP
 #define AMBIENT_MEMORY_CPU_FIXED_HPP
 
-namespace ambient { namespace memory { namespace cpu {
+namespace ambient {
+    namespace memory {
+        namespace cpu {
 
-    struct fixed {
-        // boost::singleton_pool<fixed,S> can be used instead (implicit mutex)
-        template<size_t S> static void* malloc(){ return std::malloc(S);   }
-        template<size_t S> static void* calloc(){ return std::calloc(1,S); }
-        template<size_t S> static void free(void* ptr){ std::free(ptr);    }
-    };
+            struct fixed {
+                // boost::singleton_pool<fixed,S> can be used instead (implicit mutex)
+                template<size_t S> static void* malloc() { return std::malloc(S); }
+                template<size_t S> static void* calloc() { return std::calloc(1, S); }
+                template<size_t S> static void free(void* ptr) { std::free(ptr); }
+            };
 
-} } }
+        }
+    }
+}
 
 #endif
