@@ -7,8 +7,8 @@ int main(){
     using namespace ambient;
     typedef tiles<matrix<double> > mtx;
 
-    size_t m = 16384;
-    size_t n = 16384;
+    size_t m = 4096;
+    size_t n = 4096;
 
     mtx pA(m,n);
     mtx pB(n,m);

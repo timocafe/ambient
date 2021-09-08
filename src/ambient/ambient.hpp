@@ -49,6 +49,7 @@
 #if AMBIENT_MPI != MPI_DISABLE
 #include <mpi.h>
 #endif
+#include <Eigen/Dense>
 #include <complex>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +59,7 @@
 #include <vector>
 #include <stack>
 #include <set>
+#include <random>
 #include <map>
 #include <list>
 #include <memory.h>

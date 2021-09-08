@@ -2,7 +2,7 @@
 #include "ambient/container/numeric/matrix.hpp"
 #include "utils/timer.hpp"
 
-#define N AMBIENT_DEFAULT_IB*64
+#define N AMBIENT_DEFAULT_IB*8
 
 struct Decomposition {
     void init(int np, int nq){
