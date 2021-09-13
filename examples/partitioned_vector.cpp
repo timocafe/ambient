@@ -19,14 +19,16 @@ int main(){
     ambient::replace(b.begin(), b.end(), 40, 87);
 
     ambient::partitioned_vector<ambient::vector<int>, 1024*1024> seq(8*1024*1024);
-    ambient::sequence(seq.begin(), seq.end());
-    auto res = ambient::reduce(seq.begin(), seq.end(), (double)0.);
+    ambient::fill(seq.begin(), seq.end(), 1);
+//  ambient::sequence(seq.begin(), seq.end());
+    auto res = ambient::reduce(seq.begin(), seq.end(), 0);
 
-    ambient::sort(seq.begin(), seq.end());
-    ambient::sort(seq.begin(), seq.end(), [](int a, int b){ return a > b; });
+//  ambient::sort(seq.begin(), seq.end());
+//  ambient::sort(seq.begin(), seq.end(), [](int a, int b){ return a > b; });
 
-    auto pos = ambient::find(seq.begin(), seq.end(), 8*1024*1024-1);
+//  auto pos = ambient::find(seq.begin(), seq.end(), 8*1024*1024-1);
 
     ambient::sync();
+    std::cout << ambient::load(res).get() << std::endl;
     return 0;
 }

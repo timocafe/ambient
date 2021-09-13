@@ -8,7 +8,6 @@ cmake_minimum_required (VERSION 3.0)
 
 project (ambient)
 
-
 SET(CMAKE_CXX_STANDARD 20)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -28,8 +27,8 @@ set(AMBIENT_SOURCES_DIR "${PROJECT_SOURCE_DIR}/src")
 #
 ########################################################################
 
-set(AMBIENT_THREADING "auto" CACHE STRINGS "cilk, openmp, none or auto.")
-set(AMBIENT_MPI "auto" CACHE STRINGS "disable, single, funneled, serialized, multiple or auto.")
+set(AMBIENT_THREADING "none" CACHE STRINGS "cilk, openmp, none or auto.")
+set(AMBIENT_MPI "disable" CACHE STRINGS "disable, single, funneled, serialized, multiple or auto.")
 set(MKL_LIB_DIR "" CACHE PATH "Location of BLAS/LAPACK libraries.")
 set(MKL_LIBRARIES "" CACHE STRINGS "BLAS/LAPACK libraries")
 set(PLASMA_LIB_DIR "" CACHE PATH "Location of PLASMA libraries.")
@@ -105,6 +104,20 @@ message(STATUS "AMBIENT DEFINITIONS: ${AMBIENT_DEFINITIONS}")
 message(STATUS "AMBIENT COMPILER_FLAGS: ${AMBIENT_COMPILER_FLAGS}")
 message(STATUS "AMBIENT LIBRARIES: ${AMBIENT_LIBRARIES}")
 message(STATUS "AMBIENT INCLUDE DIRS: ${AMBIENT_INCLUDE_DIRS}")
+
+########################################################################
+#
+# Boost for deep learning needs png and jpeg
+#
+########################################################################
+
+find_package(Boost)
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+include_directories(${PNG_INCLUDE_DIR})
+include_directories(${JPEG_INCLUDE_DIR})
+find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
+add_subdirectory(deep_learning)
 
 ########################################################################
 #

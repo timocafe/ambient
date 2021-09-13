@@ -263,6 +263,13 @@ namespace ambient {
         }
 
         template <typename T, class A>
+        inline void fill_col(matrix<T, A>& a, const std::vector<T>& v, const size_t begin, const size_t size, const size_t j) {
+            const std::vector<T>* v_ptr = &v;
+            kernels::template fill_col<T, A>(v_ptr, a, begin, size, j);
+            ambient::sync();
+        }
+
+        template <typename T, class A>
         inline void add_inplace(matrix<T, A>& lhs, const matrix<T, A>& rhs) {
             if (ambient::weak(rhs)) return;
             else if (ambient::weak(lhs)) ambient::merge(rhs, lhs);

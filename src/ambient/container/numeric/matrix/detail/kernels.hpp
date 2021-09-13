@@ -525,6 +525,14 @@ namespace ambient {
                         if (v > 1e-10) ac->push_back(v * v);
                     }
                 }
+            
+                template<typename T, class A>
+                void fill_col(const std::vector<T>*& ac, volatile matrix<T>& a, const size_t& begin, const size_t& size, const size_t& j){
+                      matrix<T, A>& a_ = const_cast<matrix<T>&>(a);
+                      T* ad = a.data();
+                      size_t lda = a_.num_rows(); // k*lda beginning of the col
+                      std::memcpy((void*)&ad[j*lda], (void*)&(*ac)[begin], size * sizeof(T));
+                }
 
                 template<typename T>
                 void cast_to_vector(std::vector<T>*& ac, const matrix<T>& a, const size_t& m, const size_t& n, const size_t& lda, const size_t& offset) {
@@ -689,6 +697,7 @@ namespace ambient {
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::overlap, overlap)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::add, add)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::sub, sub)
+                AMBIENT_STATIC_ASYNC_TEMPLATE(detail::fill_col, fill_col)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::scale, scale)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::scale_offset, scale_offset)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::scale_inverse, scale_inverse)

@@ -675,6 +675,20 @@ namespace ambient { inline namespace numeric {
         if(i+m < a.num_rows()) copy_block(a, i+m, 0, r, i, 0, a.num_rows()-i-m, a.num_cols());
         swap(a, r);
     }
+    
+    template<typename Matrix, int IB>
+    inline void fill_col(tiles<Matrix, IB>& a, const std::vector<value_type>& v, size_t j){
+        // get number of block follows the lines
+        const auto mt = a.mt;
+        const size_t jtile = j / IB;
+        const size_t jlocal = j % IB;
+        for(int i = 0; i < mt; i++){
+            Matrix& matrix = a.tile(i, jtile);
+            const size_t begin = i*IB;
+            const size_t size = (i == mt-1) ? v.size() - i * IB : IB;
+            fill_col(matrix, v, begin, size, jlocal);
+        }
+    }
 
     template<typename T, int IB> 
     inline void resize(tiles<diagonal_matrix<T>, IB>& a, size_t m, size_t n){
@@ -703,6 +717,7 @@ namespace ambient { inline namespace numeric {
         if(j+n < a.num_rows()) copy_block(a.get_data(), j+n, 0, r.get_data(), j, 0, a.num_rows()-j-n, 1);
         swap(a, r);
     }
+
 
     template<typename T, int IB>
     inline void remove_rows(tiles<diagonal_matrix<T>, IB>& a, size_t i, size_t m){

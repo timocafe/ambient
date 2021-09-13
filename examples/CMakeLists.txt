@@ -2,5 +2,9 @@ set(examples mp_gemm_log mp_gemm_simple future  matrix vector partitioned_vector
 
 foreach(example ${examples})
     add_executable(ex_${example} ${example}.cpp)
-    target_link_libraries(ex_${example}  PUBLIC OpenMP::OpenMP_CXX Eigen3::Eigen ambient)
+    if(${AMBIENT_THREADING} MATCHES "openmp")
+        target_link_libraries(ex_${example}  PUBLIC OpenMP::OpenMP_CXX Eigen3::Eigen ambient)
+    else()
+        target_link_libraries(ex_${example}  PUBLIC Eigen3::Eigen ambient)
+    endif()
 endforeach(example)
