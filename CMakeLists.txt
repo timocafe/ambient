@@ -8,7 +8,11 @@ cmake_minimum_required (VERSION 3.0)
 
 project (ambient)
 
+#c++ standard
 SET(CMAKE_CXX_STANDARD 20)
+#cland format
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
+include(ClangFormat)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "/opt/ambient" CACHE PATH "Ambient install prefix" FORCE)
@@ -192,3 +196,15 @@ install(DIRECTORY examples
 
 install(FILES ${PROJECT_BINARY_DIR}/AmbientConfig.cmake
         DESTINATION share)
+
+
+########################################################################
+#
+# Format
+#
+########################################################################
+
+clangformat_setup(
+    deep_learning/logistic_regression.cpp
+    deep_learning/neural_network.h
+)

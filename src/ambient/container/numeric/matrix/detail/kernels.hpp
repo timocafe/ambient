@@ -467,20 +467,24 @@ namespace ambient {
                     for (size_t jj = 0; jj < sizex; ++jj) ad[jj + m * jj] = 1.;
                 }
 
-                inline void randomize(double& a) {
+                template<class T>
+                inline void randomize(T& a) {
                     a = drand48();
                 }
 
-                inline void randomize(std::complex<double>& a) {
+                template<class T>
+                inline void randomize(std::complex<T>& a) {
                     a.real(drand48());
                     a.imag(drand48());
                 }
 
-                inline void randomize_diag(double& a) {
+                template<class T>
+                inline void randomize_diag(T& a) {
                     a = drand48();
                 }
 
-                inline void randomize_diag(std::complex<double>& a) {
+                template<class T>
+                inline void randomize_diag(std::complex<T>& a) {
                     a.real(drand48());
                     a.imag(0.0);
                 }
