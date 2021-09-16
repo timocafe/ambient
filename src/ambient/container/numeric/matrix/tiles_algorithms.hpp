@@ -902,6 +902,16 @@ namespace ambient { inline namespace numeric {
     }
 
     template <class Matrix, int IB>
+    inline tiles<Matrix, IB> add_broadcast(const tiles<Matrix, IB>& a, const tiles<Matrix, IB>& b){
+        tiles<Matrix, IB> r(a);
+        for(int i = 0; i < r.mt; i++)
+            for(int j = 0; j < r.nt; j++)
+                add_broadcast(r.tile(i,j), b.tile(i,0));
+        return r;
+    }
+
+
+    template <class Matrix, int IB>
     inline tiles<Matrix, IB> operator - (tiles<Matrix, IB> lhs, const tiles<Matrix, IB>& rhs){ 
         return (lhs -= rhs);
     }

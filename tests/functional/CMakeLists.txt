@@ -36,6 +36,10 @@ foreach( functional_test
          adjoint
          hermitian
        )
-    target_link_libraries (${functional_test} PUBLIC  Eigen3::Eigen OpenMP::OpenMP_CXX ambient)
+    if(${AMBIENT_THREADING} MATCHES "openmp")
+        target_link_libraries (${functional_test} PUBLIC  Eigen3::Eigen OpenMP::OpenMP_CXX ambient)
+    else()
+        target_link_libraries (${functional_test} PUBLIC  Eigen3::Eigen ambient)
+    endif()
     add_test(${functional_test} ${functional_test})
 endforeach(functional_test)

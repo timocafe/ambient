@@ -352,27 +352,34 @@ namespace ambient {
 
                 template<typename T, class A>
                 void add(matrix<T, A>& a, const matrix<T, A>& b) {
-                    const T* bd = b.data();
-                    T* ar = a.data();
+                    using eigen_vector_type = Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
+                    using const_eigen_vector_type = const Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
 
                     int size = ambient::get_square_dim(a);
 
-                    using eigen_vector_type = Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
-                    using const_eigen_vector_type = const Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
                     Eigen::Map<eigen_vector_type>(a.data(), size) += Eigen::Map<const_eigen_vector_type>(b.data(), size);
                 }
-
+            
                 template<typename T>
                 void sub(matrix<T>& a, const matrix<T>& b) {
-                    const T* bd = b.data();
-                    T* ar = a.data();
+                    using eigen_vector_type = Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
+                    using const_eigen_vector_type = const Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
 
                     int size = ambient::get_square_dim(a);
 
+                    Eigen::Map<eigen_vector_type>(a.data(), size) -= Eigen::Map<const_eigen_vector_type>(b.data(), size);
+                }
+
+                template<typename T, class A>
+                void add_broadcast(matrix<T, A>& a, const matrix<T, A>& b) {
                     using eigen_vector_type = Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
                     using const_eigen_vector_type = const Eigen::Matrix<T, Eigen::Dynamic, 1, Eigen::ColMajor>;
-                    Eigen::Map<eigen_vector_type>(a.data(), size) -= Eigen::Map<const_eigen_vector_type>(b.data(), size);
 
+                    int n = a.num_rows();
+                    int m = a.num_cols();
+
+                    for(int i=0; i<m; ++i)
+                        Eigen::Map<eigen_vector_type>(a.data() + i*n, n) += Eigen::Map<const_eigen_vector_type>(b.data(), n);
                 }
 
                 template<typename T>
@@ -683,7 +690,7 @@ namespace ambient {
                 }
             }
 
-            AMBIENT_STATIC_ASYNC_TEMPLATE(detail::geqrt, geqrt)
+                AMBIENT_STATIC_ASYNC_TEMPLATE(detail::geqrt, geqrt)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::ormqr, ormqr)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::tsqrt, tsqrt)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::tsmqr, tsmqr)
@@ -701,6 +708,7 @@ namespace ambient {
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::overlap, overlap)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::add, add)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::sub, sub)
+                AMBIENT_STATIC_ASYNC_TEMPLATE(detail::add_broadcast, add_broadcast)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::fill_col, fill_col)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::scale, scale)
                 AMBIENT_STATIC_ASYNC_TEMPLATE(detail::scale_offset, scale_offset)

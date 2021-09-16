@@ -36,3 +36,12 @@ TEST_CASE("Matrix gemms is computed", "[scale]")
     REQUIRE((B == A));
 
 }
+
+TEST_CASE("Matrix add broadcast is computed", "[broadcast]")
+{
+    matrix<double> A(TEST_M, TEST_N, 1.);
+    matrix<double> B(TEST_M, 1, 2.);
+    matrix<double> C(TEST_M, TEST_N, 3.);
+
+    REQUIRE((add_broadcast(A,B) == C));
+}

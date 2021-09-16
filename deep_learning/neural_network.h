@@ -19,7 +19,7 @@ struct layer {
     generate(w_);
   }
 
-  auto linear_forward(const matrix &a) { return w_ * a + b_; }
+  auto linear_forward(const matrix &a) { return add_broadcast(w_ * a, b_); }
 
   matrix w_;
   matrix b_;

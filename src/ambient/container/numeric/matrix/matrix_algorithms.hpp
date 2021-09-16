@@ -124,6 +124,12 @@ namespace ambient {
         inline void gemm(const diagonal_matrix<T>& a, const diagonal_matrix<T>& b, diagonal_matrix<T>& c) {
             kernels::template gemm_diagonal<T>(a, b, c);
         }
+    
+    
+        template <typename T, class A>
+        inline void add_broadcast(matrix<T,A>& a, const matrix<T,A>& b) {
+            kernels::template add_broadcast<T,A>(a, b);
+        }
 
         template<typename T, class A>
         inline void scale(matrix<T, A>& a, size_t ai, size_t aj, const diagonal_matrix<T>& alfa, size_t alfai, size_t alfaj) {
